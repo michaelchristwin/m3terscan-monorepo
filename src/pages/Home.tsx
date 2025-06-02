@@ -4,6 +4,7 @@ import RecentBlocks from "../components/RecentBlocks";
 import RevenueChart from "../components/RevenueChart";
 import { motion } from "framer-motion";
 import { formatCardValue } from "../utils/numberFormat";
+import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 
 const container = {
 	hidden: { opacity: 0 },
@@ -18,6 +19,7 @@ const container = {
 
 const Home = () => {
 	const cardData = useCardStore((state) => state.cardData);
+	const revenueGrowth = useCardStore((state) => state.revenueGrowth);
 	return (
 		<main className=" pb-4 md:px-14 lg:px-20">
 			<motion.div
@@ -36,7 +38,25 @@ const Home = () => {
 				))}
 			</motion.div>
 			<h3>Total Revenue</h3>
-			<h1>{formatCardValue(cardData[0].value)}</h1>
+			<div className="flex items-center gap-1.5 mb-4">
+				<h1>{formatCardValue(cardData[0].value)}</h1>
+				<span
+					className={`flex items-center gap-1 px-2 py-1 rounded ${
+						Number(revenueGrowth) >= 0
+							? "bg-[var(--color-success)]"
+							: "bg-[var(--color-invalid)]"
+					}`}
+				>
+					{revenueGrowth}%
+					<span>
+						{Number(revenueGrowth) >= 0 ? (
+							<ArrowUpRight size={12} />
+						) : (
+							<ArrowDownRight size={12} />
+						)}
+					</span>
+				</span>
+			</div>
 			<RevenueChart />
 
 			<h3>Recent Blocks</h3>

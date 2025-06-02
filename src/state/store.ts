@@ -21,6 +21,7 @@ interface MonthlyCardData {
 interface CardStore {
 	cardData: CardData[];
 	monthlyCardData: MonthlyCardData[];
+	revenueGrowth: number | string;
 }
 
 const generateMonthlyData = () => {
@@ -97,9 +98,24 @@ const generateMonthlyData = () => {
 
 export const useCardStore = create<CardStore>(() => {
 	const { monthlyCardData, cardData } = generateMonthlyData();
+	let revenueGrowth: number | string = 0;
+
+	if (monthlyCardData.length >= 2) {
+		const latest = Number(
+			monthlyCardData[monthlyCardData.length - 1].metrics[0]?.value ?? 0
+		);
+		const previous = Number(
+			monthlyCardData[monthlyCardData.length - 2].metrics[0]?.value ?? 1
+		);
+
+		const revenueGrowthPercentage = ((latest - previous) / previous) * 100;
+
+		revenueGrowth = revenueGrowthPercentage.toFixed(1);
+	}
 	return {
 		cardData,
 		monthlyCardData,
+		revenueGrowth,
 	};
 });
 
