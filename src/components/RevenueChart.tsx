@@ -40,7 +40,7 @@ const tooltipBodyColor = getComputedStyle(document.documentElement)
 const RevenueChart = () => {
 	const { monthlyCardData } = useCardStore();
 	const [showCurrentYear, setShowCurrentYear] = useState(true);
-	const [chartType, setChartType] = useState<"bar" | "line">("bar");
+	const [chartType, setChartType] = useState<"bar" | "line">("line");
 
 	const currentYear = new Date().getFullYear();
 	const filteredData = monthlyCardData.filter((monthData) =>
