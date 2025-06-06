@@ -88,6 +88,8 @@
 
 	/* Common */
 	--accent-color: #ffe0cb;
+	--accent-color-secondary: #ffdfc4;
+	--accent-color-tertiary: #f6ebdf;
 	--icon-color: #fc7319;
 	--color-success: #73c336;
 	--color-invalid: #c33638;
@@ -145,6 +147,7 @@ a {
 	color: orangered;
 	text-decoration: none;
 	transition: color 0.3s ease;
+	cursor: pointer;
 }
 
 a:hover {
@@ -170,6 +173,7 @@ small {
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	padding: 16px;
 	margin: 16px 0;
+	text-align: center;
 	transition: box-shadow 0.3s ease;
 }
 

@@ -3,6 +3,7 @@ import { useBlockStore } from "../state/store";
 import { FaSlidersH } from "react-icons/fa";
 import FilterBlocks from "./FilterBlocks";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router";
 
 export default function RecentBlocks() {
 	const blockData = useBlockStore((state) => state.blockData);
@@ -12,6 +13,13 @@ export default function RecentBlocks() {
 		status: "",
 		proposer: "",
 	});
+	const navigate = useNavigate();
+
+	// const handleRowClick =
+	// 	(proposer: string) => (e: React.MouseEvent<HTMLTableRowElement>) => {
+	// 		e.preventDefault();
+	// 		selectMeterId(proposer);
+	// 	};
 
 	// Apply filters to block data
 	const filteredBlocks = blockData.filter((block) => {
@@ -130,6 +138,9 @@ export default function RecentBlocks() {
 												animate="visible"
 												variants={rowVariants}
 												key={index}
+												onClick={() =>
+													navigate(`/meter/${block.meterId}/chart`)
+												}
 												className="text-sm hover:bg-[var(--background-secondary)] transition-colors"
 											>
 												<td className="py-3 pr-4 font-medium whitespace-nowrap">

@@ -2,8 +2,8 @@ import { BiSearch, BiSearchAlt } from "react-icons/bi";
 import { useBlockStore } from "../state/store";
 import { useState } from "react";
 
-const SearchBar = () => {
-	const { searchBlocks, clearSearch, filteredData, blockData } =
+const SearchBar = (props: { placeholder: string }) => {
+	const { searchBlocks, clearSearch, filteredData, blockData, selectMeterId } =
 		useBlockStore();
 	const [query, setQuery] = useState("");
 	const [isFocused, setIsFocused] = useState(false);
@@ -31,7 +31,11 @@ const SearchBar = () => {
 				/>
 				<input
 					type="text"
-					placeholder="Search"
+					placeholder={props.placeholder}
+					autoComplete="off"
+					autoCorrect="off"
+					spellCheck="false"
+					aria-label="Search blocks"
 					value={query}
 					onChange={handleInputChange}
 					onFocus={() => setIsFocused(true)}
@@ -49,6 +53,7 @@ const SearchBar = () => {
 								<li
 									key={block.number}
 									className="px-4 py-2 hover:bg-[var(--background-secondary)] transition-colors rounded cursor-pointer"
+									onClick={() => selectMeterId(block.meterId)}
 								>
 									<div className="flex justify-between items-center">
 										<span className="font-medium">Block {block.number}</span>

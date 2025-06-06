@@ -129,181 +129,272 @@ interface blockData {
 	date: string;
 	time: string;
 	proposer: string;
+	meterId: string;
+}
+
+interface HourlyEnergyUsage {
+	meterId: string;
+	hour: string;
+	energyUsed: number;
+	timestamp: string;
 }
 
 interface BlockStore {
+	// core data
 	blockData: blockData[];
 	filteredData: blockData[];
+	hourlyEnergyUsage: HourlyEnergyUsage[];
+
+	// meter selection state
+	selectedMeterId: string | null;
+	meterIdBlocks: blockData[];
+	meterEnergyUsage: HourlyEnergyUsage[];
+
+	// searchmethods
 	searchBlocks: (query: string) => void;
 	searchProposer: (query: string) => void;
 	searchBlockNumber: (query: string) => void;
 	clearSearch: () => void;
+
+	// meter selection methods
+	selectMeterId: (meterId: string) => void;
+	clearSelectedMeterId: () => void;
+
+	// energy usage accessor
+	getEnergyUsageForMeter: () => HourlyEnergyUsage[];
 }
 
+const staticBlockData: blockData[] = [
+	{
+		number: 100,
+		address: "0xID1479C185d32EB90533a0Bb36B3FCa5F84A0E6B",
+		status: "Successful",
+		date: "25/01/2024",
+		time: "6:30am",
+		proposer: "Christwin. I",
+		meterId: "54123456789",
+	},
+	{
+		number: 99,
+		address: "0xID1479C185d32EB90533a0Bb36B3FCa5F84A0E6B",
+		status: "Successful",
+		date: "25/01/2024",
+		time: "6:30am",
+		proposer: "John Doe",
+		meterId: "54123456789",
+	},
+	{
+		number: 98,
+		address: "0xID1479C185d32EB90533a0Bb36B3FCa5F84A0E6B",
+		status: "Invalid",
+		date: "25/01/2024",
+		time: "6:35am",
+		proposer: "Christwin. I",
+		meterId: "37123456789",
+	},
+	{
+		number: 97,
+		address: "0xID84A0E6B1479C185d32EB90533a0Bb36B3FCa5F",
+		status: "Successful",
+		date: "25/01/2024",
+		time: "6:35am",
+		proposer: "Jude. G",
+		meterId: "62123456789",
+	},
+	{
+		number: 96,
+		address: "0xIDFFEE9185d32EB90533a0Bb36B3FCa5F84A0E6B",
+		status: "Invalid",
+		date: "25/01/2024",
+		time: "6:40am",
+		proposer: "Mary Snow",
+		meterId: "37123456789",
+	},
+	{
+		number: 95,
+		address: "0xID7A9C185d32EB90533a0Bb36B3FCa5F84A0E6BB",
+		status: "Successful",
+		date: "25/01/2024",
+		time: "6:40am",
+		proposer: "Tina Wendy",
+		meterId: "54123456789",
+	},
+	{
+		number: 94,
+		address: "0xIDCD32185d32EB90533a0Bb36B3FCa5F84A0E6B",
+		status: "Invalid",
+		date: "25/01/2024",
+		time: "6:45am",
+		proposer: "Christwin. I",
+		meterId: "62123456789",
+	},
+	{
+		number: 93,
+		address: "0xID8479C185d32EB90533a0Bb36B3FCa5F84A0E6B",
+		status: "Successful",
+		date: "25/01/2024",
+		time: "6:45am",
+		proposer: "Giyu Tomioka",
+		meterId: "37123456789",
+	},
+	{
+		number: 92,
+		address: "0xID1479C1B3C2EB90533a0Bb36B3FCa5F84A0E6B",
+		status: "Successful",
+		date: "25/01/2024",
+		time: "6:50am",
+		proposer: "Christwin. I",
+		meterId: "54123456789",
+	},
+	{
+		number: 91,
+		address: "0xID1479C185d32EBAA533a0Bb36B3FCa5F84A0E6B",
+		status: "Successful",
+		date: "25/01/2024",
+		time: "6:50am",
+		proposer: "Jude. G",
+		meterId: "37123456789",
+	},
+	{
+		number: 90,
+		address: "0xIDA23C185d32EB90533a0Bb36B3FCa5F84A0E6B",
+		status: "Successful",
+		date: "25/01/2024",
+		time: "6:55am",
+		proposer: "Bruce Wayne",
+		meterId: "55112233445",
+	},
+	{
+		number: 89,
+		address: "0xID1479C8888EB90533a0Bb36B3FCa5F84A0E6B",
+		status: "Invalid",
+		date: "25/01/2024",
+		time: "6:55am",
+		proposer: "Jude. G",
+		meterId: "44112233445",
+	},
+	{
+		number: 88,
+		address: "0xID1479C185d32EB90ABCa0Bb36B3FCa5F84A0E6B",
+		status: "Successful",
+		date: "25/01/2024",
+		time: "7:00am",
+		proposer: "Peter Griffin",
+		meterId: "55112233445",
+	},
+	{
+		number: 87,
+		address: "0xID1479C185d32EB90533a0FFBB3FCa5F84A0E6B",
+		status: "Successful",
+		date: "25/01/2024",
+		time: "7:00am",
+		proposer: "Jude. G",
+		meterId: "54123456789",
+	},
+	{
+		number: 86,
+		address: "0xID1479C185D31AB90533a0Bb36B3FCa5F84A0E6B",
+		status: "Invalid",
+		date: "25/01/2024",
+		time: "7:05am",
+		proposer: "Christwin. I",
+		meterId: "62123456789",
+	},
+	{
+		number: 85,
+		address: "0xID1479C185d32EB90533a0BFD6B3FCa5F84A0E6B",
+		status: "Successful",
+		date: "25/01/2024",
+		time: "7:05am",
+		proposer: "Joe Swanson",
+		meterId: "44112233445",
+	},
+	{
+		number: 84,
+		address: "0xID1479C18AF32EB90533a0Bb36B3FCa5F84A0E6B",
+		status: "Invalid",
+		date: "25/01/2024",
+		time: "7:10am",
+		proposer: "Christwin. I",
+		meterId: "37123456789",
+	},
+	{
+		number: 83,
+		address: "0xID1479C185d32EB90533a0BDFD3FCa5F84A0E6B",
+		status: "Successful",
+		date: "25/01/2024",
+		time: "7:10am",
+		proposer: "Jude. G",
+		meterId: "55112233445",
+	},
+	{
+		number: 82,
+		address: "0xID1479C185d32EB90C33a0Bb36B3FCa5F84A0E6B",
+		status: "Successful",
+		date: "25/01/2024",
+		time: "7:15am",
+		proposer: "Christwin. I",
+		meterId: "44112233445",
+	},
+	{
+		number: 81,
+		address: "0xID1479C185d32EB90533a0BB66B3FCa5F84A0E6B",
+		status: "Successful",
+		date: "25/01/2024",
+		time: "7:15am",
+		proposer: "Gyomei Himejima",
+		meterId: "54123456789",
+	},
+];
+
+const generateHourlyEnergyUsage = (
+	blocks: blockData[]
+): HourlyEnergyUsage[] => {
+	const uniqueMeterIds = Array.from(
+		new Set(blocks.map((block) => block.meterId))
+	);
+	const energyData: HourlyEnergyUsage[] = [];
+
+	// Define 24-hour formatted hours from 00:00 to 23:00
+	const fixedHours = Array.from(
+		{ length: 24 },
+		(_, i) => `${i.toString().padStart(2, "0")}:00`
+	);
+
+	uniqueMeterIds.forEach((meterId) => {
+		const meterBlocks = blocks.filter((block) => block.meterId === meterId);
+		const activityLevel = meterBlocks.length / blocks.length;
+		const baseUsage = 5 + activityLevel * 20;
+
+		const date = meterBlocks[0]?.date || "2025-01-01"; // Fallback date
+
+		fixedHours.forEach((hour) => {
+			const variation = 0.7 + Math.random() * 0.6;
+			const energyUsed = parseFloat((baseUsage * variation).toFixed(1));
+			energyData.push({
+				meterId,
+				hour,
+				energyUsed,
+				timestamp: `${date} ${hour}`,
+			});
+		});
+	});
+
+	return energyData;
+};
+
+const staticHourlyEnergyUsage = generateHourlyEnergyUsage(staticBlockData);
+
 export const useBlockStore = create<BlockStore>((set, get) => ({
-	blockData: [
-		{
-			number: 100,
-			address: "0xID1479C185d32EB90533a0Bb36B3FCa5F84A0E6B",
-			status: "Successful",
-			date: "25/01/2024",
-			time: "6:30am",
-			proposer: "Christwin. I",
-		},
-		{
-			number: 99,
-			address: "0xID1479C185d32EB90533a0Bb36B3FCa5F84A0E6B",
-			status: "Successful",
-			date: "25/01/2024",
-			time: "6:30am",
-			proposer: "Jude. G",
-		},
-		{
-			number: 98,
-			address: "0xID1479C185d32EB90533a0Bb36B3FCa5F84A0E6B",
-			status: "Invalid",
-			date: "25/01/2024",
-			time: "6:30am",
-			proposer: "Christwin. I",
-		},
-		{
-			number: 97,
-			address: "0x9C1F7D85b37Eb26FA231bCa23CE394A57DfC4A9D",
-			status: "Successful",
-			date: "25/01/2024",
-			time: "6:31am",
-			proposer: "Tina M.",
-		},
-		{
-			number: 96,
-			address: "0x6A2E9D72f4D32dDcB402a2d834Cb457D5F8B7c7E",
-			status: "Invalid",
-			date: "25/01/2024",
-			time: "6:31am",
-			proposer: "Mark L.",
-		},
-		{
-			number: 95,
-			address: "0xA9832D98f54C442DBFD17dB8127d2d894Cb78912",
-			status: "Successful",
-			date: "25/01/2024",
-			time: "6:32am",
-			proposer: "Ella K.",
-		},
-		{
-			number: 94,
-			address: "0xB37F7C90D85CA0F43EBB56a382EC789CB0F123DC",
-			status: "Invalid",
-			date: "25/01/2024",
-			time: "6:32am",
-			proposer: "Tony S.",
-		},
-		{
-			number: 93,
-			address: "0x198D76CCF81A6bA83A6FaD3B7f3C3A67f098Fb8E",
-			status: "Successful",
-			date: "25/01/2024",
-			time: "6:33am",
-			proposer: "Christwin. I",
-		},
-		{
-			number: 92,
-			address: "0xD03eF8B56A6Cc12B3BbE4aEAA10C7cF8A673AcEe",
-			status: "Successful",
-			date: "25/01/2024",
-			time: "6:33am",
-			proposer: "Samuel Y.",
-		},
-		{
-			number: 91,
-			address: "0x92Bd5CE8d3FdC98a9CfBD12cCd92B1F81FfB6E61",
-			status: "Successful",
-			date: "25/01/2024",
-			time: "6:34am",
-			proposer: "Lena R.",
-		},
-		{
-			number: 90,
-			address: "0xA31BfD56CBcF9eD728AD97eBbfD9A61C1B543F17",
-			status: "Invalid",
-			date: "25/01/2024",
-			time: "6:34am",
-			proposer: "Jude. G",
-		},
-		{
-			number: 89,
-			address: "0x1789aD02f3F01FBBdD8f719B35F3Cc556F8C123E",
-			status: "Successful",
-			date: "25/01/2024",
-			time: "6:35am",
-			proposer: "Tina M.",
-		},
-		{
-			number: 88,
-			address: "0xC3984Ae92dCBF1d2eD62fC891Bb43f0E372C412D",
-			status: "Successful",
-			date: "25/01/2024",
-			time: "6:35am",
-			proposer: "Christwin. I",
-		},
-		{
-			number: 87,
-			address: "0x7D213F2BdEC15F2984C3f77e63bC5BfE9123A76C",
-			status: "Invalid",
-			date: "25/01/2024",
-			time: "6:36am",
-			proposer: "Tony S.",
-		},
-		{
-			number: 86,
-			address: "0x5C234Ed8BF8CdDaA451FEfD9822341D89Fe21D3A",
-			status: "Successful",
-			date: "25/01/2024",
-			time: "6:36am",
-			proposer: "Ella K.",
-		},
-		{
-			number: 85,
-			address: "0x3E87FcA3BdD34D32BdFc9eFe43F9F1A89Ff0Db81",
-			status: "Successful",
-			date: "25/01/2024",
-			time: "6:37am",
-			proposer: "Lena R.",
-		},
-		{
-			number: 84,
-			address: "0xF7A123D3f12Bd4Ea987DdBCFa7E1fA1A4B0eB12A",
-			status: "Invalid",
-			date: "25/01/2024",
-			time: "6:37am",
-			proposer: "Samuel Y.",
-		},
-		{
-			number: 83,
-			address: "0xEDFC12BBaF98e4aEA2A9F7dA123bC341EbFF45DC",
-			status: "Successful",
-			date: "25/01/2024",
-			time: "6:38am",
-			proposer: "Tina M.",
-		},
-		{
-			number: 82,
-			address: "0x234BeD98AAED90cB9DE7B341Fb87BbE1F0EABC12",
-			status: "Successful",
-			date: "25/01/2024",
-			time: "6:38am",
-			proposer: "Christwin. I",
-		},
-		{
-			number: 81,
-			address: "0x1DC32BdD8ABaFe98Fb89C1D9C78c2BfE4B123D1D",
-			status: "Invalid",
-			date: "25/01/2024",
-			time: "6:39am",
-			proposer: "Jude. G",
-		},
-	],
+	blockData: staticBlockData,
 	filteredData: [],
+
+	selectedMeterId: null,
+	meterIdBlocks: [],
+	meterEnergyUsage: [],
+
+	hourlyEnergyUsage: staticHourlyEnergyUsage,
+
 	searchBlocks: (query) => {
 		const normalizedQuery = query.toLowerCase().trim();
 
@@ -322,6 +413,7 @@ export const useBlockStore = create<BlockStore>((set, get) => ({
 			return { filteredData: results };
 		});
 	},
+
 	searchProposer: (query: string) => {
 		const lowercaseQuery = query.toLowerCase();
 		const results = get().blockData.filter((block: blockData) =>
@@ -336,4 +428,32 @@ export const useBlockStore = create<BlockStore>((set, get) => ({
 		set({ filteredData: results });
 	},
 	clearSearch: () => set({ filteredData: [] }),
+
+	selectMeterId: (meterId: string) =>
+		set((state) => {
+			const meterIdBlocks = state.blockData.filter(
+				(block) => block.meterId === meterId
+			);
+			const meterEnergyUsage = state.hourlyEnergyUsage.filter(
+				(usage) => usage.meterId === meterId
+			);
+
+			return {
+				selectedMeterId: meterId,
+				meterIdBlocks,
+				meterEnergyUsage,
+			};
+		}),
+
+	clearSelectedMeterId: () => {
+		set({
+			selectedMeterId: null,
+			meterIdBlocks: [],
+			meterEnergyUsage: [],
+		});
+	},
+
+	getEnergyUsageForMeter: () => {
+		return get().meterEnergyUsage || [];
+	},
 }));

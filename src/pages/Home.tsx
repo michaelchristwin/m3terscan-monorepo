@@ -21,7 +21,7 @@ const Home = () => {
 	const cardData = useCardStore((state) => state.cardData);
 	const revenueGrowth = useCardStore((state) => state.revenueGrowth);
 	return (
-		<main className=" pb-4 md:px-14 lg:px-20">
+		<main className=" pb-4 px-4 md:px-14 lg:px-20">
 			<motion.div
 				className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-y-0 gap-x-10 "
 				variants={container}
