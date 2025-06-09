@@ -139,16 +139,25 @@ interface HourlyEnergyUsage {
 	timestamp: string;
 }
 
+interface StablecoinData {
+	symbol: string;
+	network: string;
+	value: number; //in USD
+}
+
 interface BlockStore {
 	// core data
 	blockData: blockData[];
 	filteredData: blockData[];
 	hourlyEnergyUsage: HourlyEnergyUsage[];
+	stablecoinData: StablecoinData[];
+	allMeterStablecoins: Record<string, StablecoinData[]>;
 
 	// meter selection state
 	selectedMeterId: string | null;
 	meterIdBlocks: blockData[];
 	meterEnergyUsage: HourlyEnergyUsage[];
+	meterStablecoins: StablecoinData[];
 
 	// searchmethods
 	searchBlocks: (query: string) => void;
@@ -162,6 +171,7 @@ interface BlockStore {
 
 	// energy usage accessor
 	getEnergyUsageForMeter: () => HourlyEnergyUsage[];
+	getStableCoinsForMeter: () => StablecoinData[];
 }
 
 const staticBlockData: blockData[] = [
@@ -383,17 +393,90 @@ const generateHourlyEnergyUsage = (
 	return energyData;
 };
 
+const stablecoinData: StablecoinData[] = [
+	{
+		symbol: "cUSD",
+		network: "Celo",
+		value: 1.0,
+	},
+	{
+		symbol: "USDe",
+		network: "Ethereum",
+		value: 1.0,
+	},
+	{
+		symbol: "USDC",
+		network: "Base",
+		value: 1.0,
+	},
+	{
+		symbol: "xDAI",
+		network: "Gnosis",
+		value: 1.0,
+	},
+	{
+		symbol: "DAI",
+		network: "Optimism",
+		value: 1.0,
+	},
+	{
+		symbol: "USDT",
+		network: "Polygon",
+		value: 1.0,
+	},
+	{
+		symbol: "PYUSD",
+		network: "Arbitrum",
+		value: 1.0,
+	},
+];
+
+const generateMeterStablecoins = (
+	blocks: blockData[],
+	stablecoins: StablecoinData[]
+): Record<string, StablecoinData[]> => {
+	const uniqueMeterIds = Array.from(
+		new Set(blocks.map((block) => block.meterId))
+	);
+	const meterStablecoins: Record<string, StablecoinData[]> = {};
+
+	uniqueMeterIds.forEach((meterId) => {
+		const meterBlocks = blocks.filter((block) => block.meterId === meterId);
+		const activityLevel = meterBlocks.length / blocks.length;
+
+		// Generate all stablecoins for each meter with USD values
+		meterStablecoins[meterId] = stablecoins.map((coin) => {
+			// Generate a value that fluctuates slightly around $1.00
+			// based on activity level (between $0.98 and $1.02)
+			const value = 200 + Math.random() * 450 * activityLevel;
+
+			return {
+				symbol: coin.symbol,
+				network: coin.network,
+				value: parseFloat(value.toFixed(4)), // More precise USD value
+			};
+		});
+	});
+
+	return meterStablecoins;
+};
 const staticHourlyEnergyUsage = generateHourlyEnergyUsage(staticBlockData);
+const staticMeterStablecoins = generateMeterStablecoins(
+	staticBlockData,
+	stablecoinData
+);
 
 export const useBlockStore = create<BlockStore>((set, get) => ({
 	blockData: staticBlockData,
 	filteredData: [],
+	hourlyEnergyUsage: staticHourlyEnergyUsage,
+	stablecoinData: stablecoinData,
+	allMeterStablecoins: staticMeterStablecoins,
 
 	selectedMeterId: null,
 	meterIdBlocks: [],
 	meterEnergyUsage: [],
-
-	hourlyEnergyUsage: staticHourlyEnergyUsage,
+	meterStablecoins: [],
 
 	searchBlocks: (query) => {
 		const normalizedQuery = query.toLowerCase().trim();
@@ -437,11 +520,13 @@ export const useBlockStore = create<BlockStore>((set, get) => ({
 			const meterEnergyUsage = state.hourlyEnergyUsage.filter(
 				(usage) => usage.meterId === meterId
 			);
+			const meterStablecoins = state.allMeterStablecoins[meterId] || [];
 
 			return {
 				selectedMeterId: meterId,
 				meterIdBlocks,
 				meterEnergyUsage,
+				meterStablecoins,
 			};
 		}),
 
@@ -450,10 +535,15 @@ export const useBlockStore = create<BlockStore>((set, get) => ({
 			selectedMeterId: null,
 			meterIdBlocks: [],
 			meterEnergyUsage: [],
+			meterStablecoins: [],
 		});
 	},
 
 	getEnergyUsageForMeter: () => {
 		return get().meterEnergyUsage || [];
+	},
+
+	getStableCoinsForMeter: () => {
+		return get().meterStablecoins || [];
 	},
 }));

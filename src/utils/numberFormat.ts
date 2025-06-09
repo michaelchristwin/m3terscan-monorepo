@@ -21,10 +21,10 @@ export const formatCardValue = (
 
 	if (shouldFormatAsCurrency) {
 		if (value >= 1000000) {
-			return `$${(value / 1000000).toFixed(0)}M`;
+			return `$${(value / 1000000).toFixed(1)}M`;
 		}
 		if (value >= 1000) {
-			return `$${(value / 1000).toFixed(0)}k`;
+			return `$${(value / 1000).toFixed(1)}k`;
 		}
 		return new Intl.NumberFormat("en-US", {
 			style: "currency",

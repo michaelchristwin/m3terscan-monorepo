@@ -162,7 +162,7 @@ small {
 	background-color: var(--background-secondary);
 	color: var(--text-secondary);
 	border-radius: 10.2px;
-	padding: 4px 8px;
+	padding: 6px 10px;
 	max-width: max-content;
 }
 

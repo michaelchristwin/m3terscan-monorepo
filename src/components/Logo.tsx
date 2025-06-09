@@ -13,7 +13,7 @@ const Logo = () => {
 	};
 	return (
 		<small
-			className="p-2 px-3 shadow-md uppercase whitespace-nowrap cursor-pointer"
+			className=" shadow-md uppercase whitespace-nowrap cursor-pointer"
 			onClick={handleBack}
 		>
 			switch

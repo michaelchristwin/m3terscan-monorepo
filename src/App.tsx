@@ -15,24 +15,28 @@ import Activity from "./pages/Activity";
 import AskAI from "./pages/AskAI";
 
 function App() {
-	const usage = useBlockStore((state) => state.getEnergyUsageForMeter());
 	const meterIdBlocks = useBlockStore((state) => state.meterIdBlocks);
 	const proposers = Array.from(new Set(meterIdBlocks.map((b) => b.proposer)));
 
 	return (
 		<Router>
 			<Header />
-			<Routes>
-				<Route path="/" element={<Home />} />
-				<Route path="/meter/:meterId" element={<DashboardLayout />}>
-					<Route index element={<Navigate to="chart" replace />} />
-					<Route path="chart" element={<Chart usage={usage} />} />
-					<Route path="overview" element={<Overview proposers={proposers} />} />
-					<Route path="trades" element={<Trades />} />
-					<Route path="activity" element={<Activity />} />
-					<Route path="ask-ai" element={<AskAI />} />
-				</Route>
-			</Routes>
+			<main className="scroll-mt-16 md:scroll-mt-20 lg:scroll-mt-24">
+				<Routes>
+					<Route path="/" element={<Home />} />
+					<Route path="/meter/:meterId" element={<DashboardLayout />}>
+						<Route index element={<Navigate to="chart" replace />} />
+						<Route path="chart" element={<Chart />} />
+						<Route
+							path="overview"
+							element={<Overview proposers={proposers} />}
+						/>
+						<Route path="trades" element={<Trades />} />
+						<Route path="activity" element={<Activity />} />
+						<Route path="ask-ai" element={<AskAI />} />
+					</Route>
+				</Routes>
+			</main>
 		</Router>
 	);
 }
