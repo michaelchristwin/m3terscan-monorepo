@@ -1,10 +1,12 @@
 import { useEffect, useRef, useMemo } from "react";
-import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
+import { Chart } from "chart.js/auto";
+import { ArcElement, Tooltip, Legend } from "chart.js";
 import {
 	DoughnutController,
 	type Plugin,
 	type ChartTypeRegistry,
 } from "chart.js";
+// import { Doughnut } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { useBlockStore } from "../state/store";
 import { formatCardValue } from "../utils/numberFormat";
