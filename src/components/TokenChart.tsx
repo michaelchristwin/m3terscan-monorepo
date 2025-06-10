@@ -1,12 +1,22 @@
 import { useEffect, useRef, useMemo } from "react";
 import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
-import type { DoughnutController, Plugin, ChartTypeRegistry } from "chart.js";
+import {
+	DoughnutController,
+	type Plugin,
+	type ChartTypeRegistry,
+} from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { useBlockStore } from "../state/store";
 import { formatCardValue } from "../utils/numberFormat";
 import { motion } from "framer-motion";
 
-Chart.register(ArcElement, Tooltip, Legend, ChartDataLabels);
+Chart.register(
+	DoughnutController,
+	ArcElement,
+	Tooltip,
+	Legend,
+	ChartDataLabels
+);
 
 interface CenterTextPluginOptions {
 	text: string;
