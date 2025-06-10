@@ -1,6 +1,5 @@
 import { useEffect, useRef, useMemo } from "react";
-import { Chart } from "chart.js/auto";
-import { ArcElement, Tooltip, Legend } from "chart.js";
+import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
 import {
 	DoughnutController,
 	type Plugin,
