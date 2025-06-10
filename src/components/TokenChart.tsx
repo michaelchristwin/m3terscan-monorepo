@@ -116,7 +116,7 @@ const TokenChart = () => {
 						backgroundColor: backgroundColors.slice(0, data.length),
 						borderWidth: 0,
 						borderRadius: 8,
-						spacing: 8,
+						spacing: 15,
 					},
 				],
 			},
