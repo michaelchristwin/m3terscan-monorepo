@@ -6,7 +6,7 @@ import { useLocation } from "react-router";
 const Header = () => {
 	const location = useLocation();
 
-	const hideSearchBarRoutes = ["/chart", "trades", "activity", "ask-ai"];
+	const hideSearchBarRoutes = ["chart", "trades", "activity", "ask-ai"];
 
 	const shouldShowSearchBar = !hideSearchBarRoutes.some((route) =>
 		location.pathname.includes(route)
