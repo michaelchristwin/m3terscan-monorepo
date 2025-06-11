@@ -20,16 +20,6 @@ Chart.register(
 	Legend
 );
 
-const tooltipBg = getComputedStyle(document.documentElement)
-	.getPropertyValue("--tooltip-bg")
-	.trim();
-const tooltipTitleColor = getComputedStyle(document.documentElement)
-	.getPropertyValue("--tooltip-title-color")
-	.trim();
-const tooltipBodyColor = getComputedStyle(document.documentElement)
-	.getPropertyValue("--tooltip-body-color")
-	.trim();
-
 const EnergyUsageChart = () => {
 	const usage = useBlockStore((state) => state.getEnergyUsageForMeter());
 	const chartRef = useRef<HTMLCanvasElement>(null);
@@ -124,9 +114,6 @@ const EnergyUsageChart = () => {
 							},
 						},
 						tooltip: {
-							backgroundColor: tooltipBg,
-							titleColor: tooltipTitleColor,
-							bodyColor: tooltipBodyColor,
 							callbacks: {
 								label: (context) => {
 									const value = context.parsed.y;
