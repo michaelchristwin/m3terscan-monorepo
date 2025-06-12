@@ -7,9 +7,11 @@ import {
 } from "chart.js";
 // import { Doughnut } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import { useBlockStore } from "../state/blockStore";
+// import { useBlockStore } from "../state/blockStore";
 import { formatCardValue } from "../utils/numberFormat";
 import { motion } from "framer-motion";
+import { useBlockData } from "../hooks/useBlockData";
+import Loader from "./Loader";
 
 Chart.register(
 	DoughnutController,
@@ -42,7 +44,16 @@ declare module "chart.js" {
 }
 
 const TokenChart = () => {
-	const { meterStablecoins } = useBlockStore();
+	const {
+		meterStablecoins: meterStablecoins,
+		refreshStablecoinData,
+		isLoading,
+		error,
+	} = useBlockData();
+
+	useEffect(() => {
+		refreshStablecoinData();
+	}, [refreshStablecoinData]);
 	const chartRef = useRef<HTMLCanvasElement>(null);
 	const chartInstance = useRef<Chart<"doughnut", number[], string> | null>(
 		null
@@ -62,6 +73,8 @@ const TokenChart = () => {
 	);
 
 	useEffect(() => {
+		if (isLoading || !meterStablecoins || meterStablecoins.length === 0) return;
+
 		if (!chartRef.current || meterStablecoins.length === 0) return;
 
 		if (chartInstance.current) {
@@ -162,7 +175,19 @@ const TokenChart = () => {
 				chartInstance.current.destroy();
 			}
 		};
-	}, [meterStablecoins, backgroundColors]);
+	}, [meterStablecoins, backgroundColors, isLoading]);
+
+	if (isLoading) {
+		return <Loader />;
+	}
+
+	if (error) {
+		return <div className="p-4 text-red-500">Error: {error}</div>;
+	}
+
+	if (!meterStablecoins || meterStablecoins.length === 0) {
+		return <div className="p-4">No Stablecoin data available</div>;
+	}
 
 	return (
 		<motion.div

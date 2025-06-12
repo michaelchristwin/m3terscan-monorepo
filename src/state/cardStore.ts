@@ -197,7 +197,7 @@ export const useCardStore = create<CardStore>((set, get) => {
 		revenueGrowth,
 		isLoading: false,
 		error: null,
-		useMockData: true, // Change to false when endpoint is ready
+		useMockData: false, // Change to false when endpoint is ready
 
 		fetchCardData: async () => {
 			const { useMockData } = get();

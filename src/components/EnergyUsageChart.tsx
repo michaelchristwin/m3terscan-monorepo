@@ -8,7 +8,7 @@ import {
 	Tooltip,
 	Legend,
 } from "chart.js";
-import { useBlockStore } from "../state/blockStore";
+import { useBlockData } from "../hooks/useBlockData";
 import { motion } from "framer-motion";
 
 Chart.register(
@@ -21,12 +21,23 @@ Chart.register(
 );
 
 const EnergyUsageChart = () => {
-	const usage = useBlockStore((state) => state.getEnergyUsageForMeter());
+	const {
+		meterEnergyUsage: usage,
+		refreshEnergyData,
+		isLoading,
+		error,
+	} = useBlockData();
+
 	const chartRef = useRef<HTMLCanvasElement>(null);
 	const chartInstance = useRef<Chart | null>(null);
 
+	// Refresh data on mount
 	useEffect(() => {
-		if (!usage || usage.length === 0) return;
+		refreshEnergyData();
+	}, [refreshEnergyData]);
+
+	useEffect(() => {
+		if (isLoading || !usage || usage.length === 0) return;
 
 		if (chartRef.current) {
 			// Sort usage by hour for chronological display
@@ -53,10 +64,8 @@ const EnergyUsageChart = () => {
 
 			chartInstance.current = new Chart(ctx, {
 				type: "bar",
-
 				data: {
 					labels: labels,
-
 					datasets: [
 						{
 							label: "Energy Usage",
@@ -77,7 +86,6 @@ const EnergyUsageChart = () => {
 				options: {
 					responsive: true,
 					maintainAspectRatio: false,
-
 					plugins: {
 						datalabels: {
 							display: false,
@@ -139,7 +147,6 @@ const EnergyUsageChart = () => {
 							},
 						},
 					},
-
 					scales: {
 						y: {
 							beginAtZero: true,
@@ -149,7 +156,6 @@ const EnergyUsageChart = () => {
 							title: {
 								display: false,
 								text: "kWh",
-								font: { weight: 600, family: "Poppins" },
 							},
 							grid: { display: false },
 						},
@@ -157,7 +163,6 @@ const EnergyUsageChart = () => {
 							title: {
 								display: false,
 								text: "Hour of Day",
-								font: { weight: 600, family: "Poppins" },
 							},
 							ticks: {
 								autoSkip: true,
@@ -178,7 +183,15 @@ const EnergyUsageChart = () => {
 				chartInstance.current.destroy();
 			}
 		};
-	}, [usage]);
+	}, [usage, isLoading]);
+
+	if (isLoading) {
+		return <div className="p-4">Loading energy data...</div>;
+	}
+
+	if (error) {
+		return <div className="p-4 text-red-500">Error: {error}</div>;
+	}
 
 	if (!usage || usage.length === 0) {
 		return <div className="p-4">No energy usage data available</div>;
@@ -189,9 +202,17 @@ const EnergyUsageChart = () => {
 			initial={{ opacity: 0, y: 40 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.5, ease: "easeOut" }}
-			className="p-4 bg-[var(--background-primary)] text-[var(--text-secondary)] rounded-lg "
+			className="p-4 bg-[var(--background-primary)] text-[var(--text-secondary)] rounded-lg"
 		>
-			<h3 className="mb-6">Energy usage by hour</h3>
+			<div className="flex justify-between items-center mb-6">
+				<h3>Energy usage by hour</h3>
+				{/* <button
+					onClick={refreshEnergyData}
+					className="px-3 py-1 text-sm bg-[var(--background-secondary)] rounded hover:bg-[var(--background-tertiary)]"
+				>
+					Refresh
+				</button> */}
+			</div>
 			<div className="relative h-80">
 				<canvas ref={chartRef} />
 			</div>

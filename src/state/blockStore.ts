@@ -25,6 +25,30 @@ export interface StablecoinData {
 	value: number; //in USD
 }
 
+// Update to match backend reponse
+interface ApiBlockData {
+	blockNumber: number;
+	blockAddress: string;
+	blockStatus: string;
+	createdAt: string; // ISO format
+	proposerName: string;
+	meterId: string;
+}
+
+// Update to match backend reponse
+interface ApiHourlyEnergyUsage {
+	meterId: string;
+	hour: string;
+	energyUsedKwh: number;
+	readingTimestamp: string;
+}
+
+interface ApiStablecoinData {
+	currencySymbol: string;
+	networkName: string;
+	usdValue: number;
+}
+
 interface BlockStore {
 	// core data
 	blockData: blockData[];
@@ -39,6 +63,11 @@ interface BlockStore {
 	meterEnergyUsage: HourlyEnergyUsage[];
 	meterStablecoins: StablecoinData[];
 
+	// Loading and error states
+	isLoading: boolean;
+	error: string | null;
+	useMockData: boolean;
+
 	// searchmethods
 	searchBlocks: (query: string) => void;
 	searchProposer: (query: string) => void;
@@ -49,12 +78,20 @@ interface BlockStore {
 	selectMeterId: (meterId: string) => void;
 	clearSelectedMeterId: () => void;
 
-	// energy usage accessor
-	getEnergyUsageForMeter: () => HourlyEnergyUsage[];
-	getStableCoinsForMeter: () => StablecoinData[];
+	// Data fetching methods
+	fetchBlockData: () => Promise<void>;
+	fetchEnergyUsageData: () => Promise<void>;
+	fetchStablecoinData: () => Promise<void>;
+	clearError: () => void;
+
+	// Development mode toggle
+	setMockMode: (useMock: boolean) => void;
 }
 
-export const staticBlockData: blockData[] = [
+const API_BASE_URL =
+	import.meta.env.REACT_APP_API_URL || "http://localhost:3001/api";
+
+const staticBlockData: blockData[] = [
 	{
 		number: 100,
 		address: "0xID1479C185d32EB90533a0Bb36B3FCa5F84A0E6B",
@@ -237,42 +274,6 @@ export const staticBlockData: blockData[] = [
 	},
 ];
 
-export const generateHourlyEnergyUsage = (
-	blocks: blockData[]
-): HourlyEnergyUsage[] => {
-	const uniqueMeterIds = Array.from(
-		new Set(blocks.map((block) => block.meterId))
-	);
-	const energyData: HourlyEnergyUsage[] = [];
-
-	// Define 24-hour formatted hours from 00:00 to 23:00
-	const fixedHours = Array.from(
-		{ length: 24 },
-		(_, i) => `${i.toString().padStart(2, "0")}:00`
-	);
-
-	uniqueMeterIds.forEach((meterId) => {
-		const meterBlocks = blocks.filter((block) => block.meterId === meterId);
-		const activityLevel = meterBlocks.length / blocks.length;
-		const baseUsage = 5 + activityLevel * 20;
-
-		const date = meterBlocks[0]?.date || "2025-01-01"; // Fallback date
-
-		fixedHours.forEach((hour) => {
-			const variation = 0.7 + Math.random() * 0.6;
-			const energyUsed = parseFloat((baseUsage * variation).toFixed(1));
-			energyData.push({
-				meterId,
-				hour,
-				energyUsed,
-				timestamp: `${date} ${hour}`,
-			});
-		});
-	});
-
-	return energyData;
-};
-
 const stablecoinData: StablecoinData[] = [
 	{
 		symbol: "cUSD",
@@ -311,6 +312,42 @@ const stablecoinData: StablecoinData[] = [
 	},
 ];
 
+export const generateHourlyEnergyUsage = (
+	blocks: blockData[]
+): HourlyEnergyUsage[] => {
+	const uniqueMeterIds = Array.from(
+		new Set(blocks.map((block) => block.meterId))
+	);
+	const energyData: HourlyEnergyUsage[] = [];
+
+	// Define 24-hour formatted hours from 00:00 to 23:00
+	const fixedHours = Array.from(
+		{ length: 24 },
+		(_, i) => `${i.toString().padStart(2, "0")}:00`
+	);
+
+	uniqueMeterIds.forEach((meterId) => {
+		const meterBlocks = blocks.filter((block) => block.meterId === meterId);
+		const activityLevel = meterBlocks.length / blocks.length;
+		const baseUsage = 5 + activityLevel * 20;
+
+		const date = meterBlocks[0]?.date || "2025-01-01"; // Fallback date
+
+		fixedHours.forEach((hour) => {
+			const variation = 0.7 + Math.random() * 0.6;
+			const energyUsed = parseFloat((baseUsage * variation).toFixed(1));
+			energyData.push({
+				meterId,
+				hour,
+				energyUsed,
+				timestamp: `${date} ${hour}`,
+			});
+		});
+	});
+
+	return energyData;
+};
+
 export const generateMeterStablecoins = (
 	blocks: blockData[],
 	stablecoins: StablecoinData[]
@@ -340,90 +377,281 @@ export const generateMeterStablecoins = (
 
 	return meterStablecoins;
 };
-const staticHourlyEnergyUsage = generateHourlyEnergyUsage(staticBlockData);
-const staticMeterStablecoins = generateMeterStablecoins(
-	staticBlockData,
-	stablecoinData
-);
 
-export const useBlockStore = create<BlockStore>((set, get) => ({
-	blockData: staticBlockData,
-	filteredData: [],
-	hourlyEnergyUsage: staticHourlyEnergyUsage,
-	stablecoinData: stablecoinData,
-	allMeterStablecoins: staticMeterStablecoins,
+// API data transformation functions
+const transformBlockData = (apiData: ApiBlockData[]): blockData[] => {
+	return apiData.map((block) => ({
+		number: block.blockNumber,
+		address: block.blockAddress,
+		status: block.blockStatus,
+		date: new Date(block.createdAt).toLocaleDateString(),
+		time: new Date(block.createdAt).toLocaleTimeString([], {
+			hour: "2-digit",
+			minute: "2-digit",
+		}),
+		proposer: block.proposerName,
+		meterId: block.meterId,
+	}));
+};
 
-	selectedMeterId: null,
-	meterIdBlocks: [],
-	meterEnergyUsage: [],
-	meterStablecoins: [],
+const transformEnergyUsageData = (
+	apiData: ApiHourlyEnergyUsage[]
+): HourlyEnergyUsage[] => {
+	return apiData.map((usage) => ({
+		meterId: usage.meterId,
+		hour: usage.hour,
+		energyUsed: usage.energyUsedKwh,
+		timestamp: usage.readingTimestamp,
+	}));
+};
 
-	searchBlocks: (query) => {
-		const normalizedQuery = query.toLowerCase().trim();
+const transformStablecoinData = (
+	apiData: ApiStablecoinData[]
+): StablecoinData[] => {
+	return apiData.map((coin) => ({
+		symbol: coin.currencySymbol,
+		network: coin.networkName,
+		value: coin.usdValue,
+	}));
+};
 
-		set((state) => {
-			if (!normalizedQuery) {
-				return { filteredData: [] };
+// API fetch functions
+const fetchBlockDataFromApi = async (): Promise<blockData[]> => {
+	// replace url with actual endpoint
+	const response = await fetch(`${API_BASE_URL}/blocks`);
+	if (!response.ok) {
+		throw new Error(`Failed to fetch block data: ${response.statusText}`);
+	}
+	const data: ApiBlockData[] = await response.json();
+	return transformBlockData(data);
+};
+
+const fetchEnergyUsageFromApi = async (): Promise<HourlyEnergyUsage[]> => {
+	// replace url with actual endpoint
+	const response = await fetch(`${API_BASE_URL}/energy-usage`);
+	if (!response.ok) {
+		throw new Error(
+			`Failed to fetch energy usage data: ${response.statusText}`
+		);
+	}
+	const data: ApiHourlyEnergyUsage[] = await response.json();
+	return transformEnergyUsageData(data);
+};
+
+const fetchStablecoinDataFromApi = async (): Promise<{
+	stablecoins: StablecoinData[];
+	meterStablecoins: Record<string, StablecoinData[]>;
+}> => {
+	// replace url with actual endpoint
+	const response = await fetch(`${API_BASE_URL}/stablecoins`);
+	if (!response.ok) {
+		throw new Error(`Failed to fetch stablecoin data: ${response.statusText}`);
+	}
+	const data: {
+		globalStablecoins: ApiStablecoinData[];
+		meterStablecoins: Record<string, ApiStablecoinData[]>;
+	} = await response.json();
+
+	return {
+		stablecoins: transformStablecoinData(data.globalStablecoins),
+		meterStablecoins: Object.fromEntries(
+			Object.entries(data.meterStablecoins).map(([meterId, coins]) => [
+				meterId,
+				transformStablecoinData(coins),
+			])
+		),
+	};
+};
+
+export const useBlockStore = create<BlockStore>((set, get) => {
+	// Initialize with mock data
+	const staticHourlyEnergyUsage = generateHourlyEnergyUsage(staticBlockData);
+	const staticMeterStablecoins = generateMeterStablecoins(
+		staticBlockData,
+		stablecoinData
+	);
+
+	return {
+		blockData: staticBlockData,
+		filteredData: [],
+		hourlyEnergyUsage: staticHourlyEnergyUsage,
+		stablecoinData: stablecoinData,
+		allMeterStablecoins: staticMeterStablecoins,
+
+		selectedMeterId: null,
+		meterIdBlocks: [],
+		meterEnergyUsage: [],
+		meterStablecoins: [],
+
+		isLoading: false,
+		error: null,
+		useMockData: true, // Change to false when endpoint is ready
+
+		searchBlocks: (query) => {
+			const normalizedQuery = query.toLowerCase().trim();
+			set((state) => {
+				if (!normalizedQuery) return { filteredData: [] };
+				const results = state.blockData.filter((block) => {
+					return (
+						block.proposer.toLowerCase().includes(normalizedQuery) ||
+						block.number.toString().includes(normalizedQuery)
+					);
+				});
+				return { filteredData: results };
+			});
+		},
+
+		searchProposer: (query: string) => {
+			const lowercaseQuery = query.toLowerCase();
+			const results = get().blockData.filter((block: blockData) =>
+				block.proposer.toLowerCase().includes(lowercaseQuery)
+			);
+			set({ filteredData: results });
+		},
+
+		searchBlockNumber: (query: string) => {
+			const results = get().blockData.filter((block: blockData) =>
+				block.number.toString().includes(query)
+			);
+			set({ filteredData: results });
+		},
+
+		clearSearch: () => set({ filteredData: [] }),
+
+		// Meter selection methods (unchanged)
+		selectMeterId: (meterId: string) =>
+			set((state) => {
+				const meterIdBlocks = state.blockData.filter(
+					(block) => block.meterId === meterId
+				);
+				const meterEnergyUsage = state.hourlyEnergyUsage.filter(
+					(usage) => usage.meterId === meterId
+				);
+				const meterStablecoins = state.allMeterStablecoins[meterId] || [];
+
+				return {
+					selectedMeterId: meterId,
+					meterIdBlocks,
+					meterEnergyUsage,
+					meterStablecoins,
+				};
+			}),
+
+		clearSelectedMeterId: () => {
+			set({
+				selectedMeterId: null,
+				meterIdBlocks: [],
+				meterEnergyUsage: [],
+				meterStablecoins: [],
+			});
+		},
+
+		// Data fetching methods
+		fetchBlockData: async () => {
+			const { useMockData } = get();
+			if (useMockData) {
+				set({ blockData: staticBlockData, error: null });
+				return;
 			}
 
-			const results = state.blockData.filter((block) => {
-				return (
-					block.proposer.toLowerCase().includes(normalizedQuery) ||
-					block.number.toString().includes(normalizedQuery)
+			set({ isLoading: true, error: null });
+			try {
+				const apiBlockData = await fetchBlockDataFromApi();
+				set({
+					blockData: apiBlockData,
+					isLoading: false,
+					error: null,
+				});
+			} catch (error) {
+				set({
+					isLoading: false,
+					error:
+						error instanceof Error
+							? error.message
+							: "Failed to fetch block data",
+				});
+			}
+		},
+
+		fetchEnergyUsageData: async () => {
+			const { useMockData } = get();
+			if (useMockData) {
+				const mockData = generateHourlyEnergyUsage(get().blockData);
+				set({ hourlyEnergyUsage: mockData, error: null });
+				return;
+			}
+
+			set({ isLoading: true, error: null });
+			try {
+				const apiEnergyData = await fetchEnergyUsageFromApi();
+				set({
+					hourlyEnergyUsage: apiEnergyData,
+					isLoading: false,
+					error: null,
+				});
+			} catch (error) {
+				set({
+					isLoading: false,
+					error:
+						error instanceof Error
+							? error.message
+							: "Failed to fetch energy data",
+				});
+			}
+		},
+
+		fetchStablecoinData: async () => {
+			const { useMockData } = get();
+			if (useMockData) {
+				const mockData = generateMeterStablecoins(
+					get().blockData,
+					stablecoinData
 				);
-			});
+				set({
+					stablecoinData,
+					allMeterStablecoins: mockData,
+					error: null,
+				});
+				return;
+			}
 
-			return { filteredData: results };
-		});
-	},
+			set({ isLoading: true, error: null });
+			try {
+				const { stablecoins, meterStablecoins } =
+					await fetchStablecoinDataFromApi();
+				set({
+					stablecoinData: stablecoins,
+					allMeterStablecoins: meterStablecoins,
+					isLoading: false,
+					error: null,
+				});
+			} catch (error) {
+				set({
+					isLoading: false,
+					error:
+						error instanceof Error
+							? error.message
+							: "Failed to fetch stablecoin data",
+				});
+			}
+		},
 
-	searchProposer: (query: string) => {
-		const lowercaseQuery = query.toLowerCase();
-		const results = get().blockData.filter((block: blockData) =>
-			block.proposer.toLowerCase().includes(lowercaseQuery)
-		);
-		set({ filteredData: results });
-	},
-	searchBlockNumber: (query: string) => {
-		const results = get().blockData.filter((block: blockData) =>
-			block.number.toString().includes(query)
-		);
-		set({ filteredData: results });
-	},
-	clearSearch: () => set({ filteredData: [] }),
+		clearError: () => set({ error: null }),
 
-	selectMeterId: (meterId: string) =>
-		set((state) => {
-			const meterIdBlocks = state.blockData.filter(
-				(block) => block.meterId === meterId
-			);
-			const meterEnergyUsage = state.hourlyEnergyUsage.filter(
-				(usage) => usage.meterId === meterId
-			);
-			const meterStablecoins = state.allMeterStablecoins[meterId] || [];
-
-			return {
-				selectedMeterId: meterId,
-				meterIdBlocks,
-				meterEnergyUsage,
-				meterStablecoins,
-			};
-		}),
-
-	clearSelectedMeterId: () => {
-		set({
-			selectedMeterId: null,
-			meterIdBlocks: [],
-			meterEnergyUsage: [],
-			meterStablecoins: [],
-		});
-	},
-
-	getEnergyUsageForMeter: () => {
-		return get().meterEnergyUsage || [];
-	},
-
-	getStableCoinsForMeter: () => {
-		return get().meterStablecoins || [];
-	},
-}));
+		setMockMode: (useMock: boolean) => {
+			set({ useMockData: useMock });
+			// Refresh all data when switching modes
+			if (useMock) {
+				get().fetchBlockData();
+				get().fetchEnergyUsageData();
+				get().fetchStablecoinData();
+			} else {
+				Promise.all([
+					get().fetchBlockData(),
+					get().fetchEnergyUsageData(),
+					get().fetchStablecoinData(),
+				]);
+			}
+		},
+	};
+});
