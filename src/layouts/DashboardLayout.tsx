@@ -174,7 +174,7 @@ const DashboardLayout = () => {
 				initial={{ y: 100 }}
 				animate={{ y: 0 }}
 				transition={{ type: "spring", stiffness: 300, damping: 30 }}
-				className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--background-primary)] rounded-t-3xl px-2 py-1 z-50"
+				className="md:hidden fixed bottom-3.5 left-5 right-5 bg-[var(--background-primary)] rounded-3xl px-2 py-1 z-50"
 			>
 				<div className="flex items-center justify-around max-w-md mx-auto">
 					{navItems.map((item) => (
