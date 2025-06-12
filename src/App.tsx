@@ -5,7 +5,7 @@ import {
 	Navigate,
 } from "react-router-dom";
 import { lazy, Suspense } from "react";
-import { useBlockStore } from "./state/store";
+import { useBlockStore } from "./state/blockStore";
 import Chart from "./pages/Charts";
 import Overview from "./pages/Overview";
 import Trades from "./pages/Trades";

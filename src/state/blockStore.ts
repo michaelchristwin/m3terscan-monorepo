@@ -1,128 +1,8 @@
 import { create } from "zustand";
-// Zustand store for managing application state
-
-// For the card data store
-// This store manages the card data and monthly card data for the dashboard
-// It generates a fixed set of monthly data for the last 12 months
-// and provides the latest card data for display on the dashboard.
-// The data includes metrics like Total Revenue, Active Users, Market Cap, and Total Regions
-// The monthly data is generated with a fixed progression to simulate growth over time
-interface CardData {
-	title: string;
-	value: number | string;
-}
-
-interface MonthlyCardData {
-	month: string;
-	year: number;
-	metrics: CardData[];
-}
-
-interface CardStore {
-	cardData: CardData[];
-	monthlyCardData: MonthlyCardData[];
-	revenueGrowth: number | string;
-}
-
-const generateMonthlyData = () => {
-	const months = [
-		"Jan",
-		"Feb",
-		"Mar",
-		"Apr",
-		"May",
-		"Jun",
-		"Jul",
-		"Aug",
-		"Sep",
-		"Oct",
-		"Nov",
-		"Dec",
-	];
-
-	const currentDate = new Date();
-	const currentYear = currentDate.getFullYear();
-	const currentMonthIndex = currentDate.getMonth();
-
-	// Predefined growth patterns
-	const revenueGrowth = [
-		30000, 19500, 22500, 27000, 18000, 34500, 28500, 31500, 33000, 24000, 21000,
-		25500,
-	];
-	const usersGrowth = [
-		800, 850, 900, 950, 1000, 1050, 1100, 1150, 1200, 1250, 1300, 1350,
-	];
-	const marketCapGrowth = [
-		8000, 8500, 9000, 9500, 10000, 10500, 11000, 11500, 12000, 12500, 13000,
-		13500,
-	];
-	const regionsGrowth = [
-		"3 countries",
-		"3 countries",
-		"4 countries",
-		"4 countries",
-		"4 countries",
-		"5 countries",
-		"5 countries",
-		"5 countries",
-		"6 countries",
-		"6 countries",
-		"6 countries",
-		"6 countries",
-	];
-
-	const monthlyData: MonthlyCardData[] = [];
-
-	for (let i = 0; i < 12; i++) {
-		const monthOffset = (currentMonthIndex - 1 - i + 12) % 12;
-		const yearOffset = currentMonthIndex - 1 - i < 0 ? 1 : 0;
-		const year = currentYear - yearOffset;
-
-		monthlyData.unshift({
-			month: months[monthOffset],
-			year: year,
-			metrics: [
-				{ title: "Total Revenue", value: revenueGrowth[i] },
-				{ title: "Active Users", value: usersGrowth[i] },
-				{ title: "Market Cap", value: marketCapGrowth[i] },
-				{ title: "Total Region", value: regionsGrowth[i] },
-			],
-		});
-	}
-
-	return {
-		monthlyCardData: monthlyData,
-		cardData: monthlyData[monthlyData.length - 1].metrics,
-	};
-};
-
-export const useCardStore = create<CardStore>(() => {
-	const { monthlyCardData, cardData } = generateMonthlyData();
-	let revenueGrowth: number | string = 0;
-
-	if (monthlyCardData.length >= 2) {
-		const latest = Number(
-			monthlyCardData[monthlyCardData.length - 1].metrics[0]?.value ?? 0
-		);
-		const previous = Number(
-			monthlyCardData[monthlyCardData.length - 2].metrics[0]?.value ?? 1
-		);
-
-		const revenueGrowthPercentage = ((latest - previous) / previous) * 100;
-
-		revenueGrowth = revenueGrowthPercentage.toFixed(1);
-	}
-	return {
-		cardData,
-		monthlyCardData,
-		revenueGrowth,
-	};
-});
-
 // For the block data store
 // This store manages the block data for the blockchain application
 // It provides functionality to search blocks by proposer or block number
-interface blockData {
+export interface blockData {
 	number: number;
 	address: string;
 	status: string;
@@ -132,14 +12,14 @@ interface blockData {
 	meterId: string;
 }
 
-interface HourlyEnergyUsage {
+export interface HourlyEnergyUsage {
 	meterId: string;
 	hour: string;
 	energyUsed: number;
 	timestamp: string;
 }
 
-interface StablecoinData {
+export interface StablecoinData {
 	symbol: string;
 	network: string;
 	value: number; //in USD
@@ -174,7 +54,7 @@ interface BlockStore {
 	getStableCoinsForMeter: () => StablecoinData[];
 }
 
-const staticBlockData: blockData[] = [
+export const staticBlockData: blockData[] = [
 	{
 		number: 100,
 		address: "0xID1479C185d32EB90533a0Bb36B3FCa5F84A0E6B",
@@ -357,7 +237,7 @@ const staticBlockData: blockData[] = [
 	},
 ];
 
-const generateHourlyEnergyUsage = (
+export const generateHourlyEnergyUsage = (
 	blocks: blockData[]
 ): HourlyEnergyUsage[] => {
 	const uniqueMeterIds = Array.from(
@@ -431,7 +311,7 @@ const stablecoinData: StablecoinData[] = [
 	},
 ];
 
-const generateMeterStablecoins = (
+export const generateMeterStablecoins = (
 	blocks: blockData[],
 	stablecoins: StablecoinData[]
 ): Record<string, StablecoinData[]> => {

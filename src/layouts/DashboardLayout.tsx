@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { useBlockStore } from "../state/store";
+import { useBlockStore } from "../state/blockStore";
 import { GoPulse } from "react-icons/go";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { BsClipboardCheck } from "react-icons/bs";

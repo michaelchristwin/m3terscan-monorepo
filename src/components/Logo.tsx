@@ -1,4 +1,4 @@
-import { useBlockStore } from "../state/store";
+import { useBlockStore } from "../state/blockStore";
 import { useNavigate } from "react-router";
 
 const Logo = () => {

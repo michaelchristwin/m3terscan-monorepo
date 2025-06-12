@@ -7,7 +7,7 @@ import {
 } from "chart.js";
 // import { Doughnut } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import { useBlockStore } from "../state/store";
+import { useBlockStore } from "../state/blockStore";
 import { formatCardValue } from "../utils/numberFormat";
 import { motion } from "framer-motion";
 

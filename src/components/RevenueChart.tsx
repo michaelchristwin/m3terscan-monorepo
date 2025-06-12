@@ -1,4 +1,4 @@
-import { useCardStore } from "../state/store";
+import { useCardStore } from "../state/cardStore";
 import { Bar, Line } from "react-chartjs-2";
 import {
 	Chart as ChartJS,

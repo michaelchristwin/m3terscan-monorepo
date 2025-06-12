@@ -8,7 +8,7 @@ import {
 	Tooltip,
 	Legend,
 } from "chart.js";
-import { useBlockStore } from "../state/store";
+import { useBlockStore } from "../state/blockStore";
 import { motion } from "framer-motion";
 
 Chart.register(
