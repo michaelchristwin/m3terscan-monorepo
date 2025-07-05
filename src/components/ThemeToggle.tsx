@@ -8,7 +8,7 @@ const getSystemTheme = () =>
 const ThemeToggle = () => {
 	const [theme, setTheme] = useState(() => {
 		if (typeof window !== "undefined") {
-			return localStorage.getItem("theme") || "system";
+			return localStorage.getItem("theme") || "light";
 		}
 		return "system";
 	});
@@ -92,7 +92,7 @@ const ThemeToggle = () => {
 								<div className="mr-1 opacity-80">{opt.icon}</div>
 								<div className="flex-1">
 									<div>{opt.label}</div>
-									{opt.value === "system" && theme === "system" && (
+									{opt.value === "system" && (
 										<span className="text-xs">Follows your OS preference</span>
 									)}
 								</div>

@@ -1,5 +1,6 @@
+import { useEffect } from "react";
 import Card from "../components/Card";
-import { useCardStore } from "../state/store";
+import { useCardData } from "../hooks/useCardData";
 import RecentBlocks from "../components/RecentBlocks";
 import RevenueChart from "../components/RevenueChart";
 import { motion } from "framer-motion";
@@ -18,10 +19,15 @@ const container = {
 };
 
 const Home = () => {
-	const cardData = useCardStore((state) => state.cardData);
-	const revenueGrowth = useCardStore((state) => state.revenueGrowth);
+	const { cardData, revenueGrowth, refreshData } = useCardData();
+
+	// Fetch data when component mounts
+	useEffect(() => {
+		refreshData();
+	}, [refreshData]);
+
 	return (
-		<main className=" pb-4 md:px-14 lg:px-20">
+		<main className=" pb-4 px-4 md:px-14 lg:px-20">
 			<motion.div
 				className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-y-0 gap-x-10 "
 				variants={container}
@@ -39,7 +45,7 @@ const Home = () => {
 			</motion.div>
 			<h3>Total Revenue</h3>
 			<div className="flex items-center gap-1.5 mb-4">
-				<h1>{formatCardValue(cardData[0].value)}</h1>
+				<h1>{formatCardValue(cardData[0]?.value || 0)}</h1>
 				<span
 					className={`flex items-center gap-1 px-2 py-1 rounded ${
 						Number(revenueGrowth) >= 0

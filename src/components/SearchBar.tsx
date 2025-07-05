@@ -1,25 +1,36 @@
 import { BiSearch, BiSearchAlt } from "react-icons/bi";
-import { useBlockStore } from "../state/store";
+import { useBlockStore } from "../state/blockStore";
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-const SearchBar = () => {
+const SearchBar = (props: { placeholder: string }) => {
+	const location = useLocation();
+	const isHomeRoute = location.pathname === "/";
+
+	const navigate = useNavigate();
+
+	// Always call the hook unconditionally
 	const { searchBlocks, clearSearch, filteredData, blockData } =
 		useBlockStore();
+
 	const [query, setQuery] = useState("");
 	const [isFocused, setIsFocused] = useState(false);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setQuery(value);
-		if (value.trim() === "") {
-			clearSearch();
-		} else {
-			searchBlocks(value);
+		if (isHomeRoute) {
+			if (value.trim() === "") {
+				clearSearch();
+			} else {
+				searchBlocks(value);
+			}
 		}
 	};
 
-	const blocksToShow = query ? filteredData : blockData;
-	const showResults = isFocused && blocksToShow.length > 0;
+	const blocksToShow = isHomeRoute ? (query ? filteredData : blockData) : [];
+	const showResults = isHomeRoute && isFocused && blocksToShow.length > 0;
 
 	return (
 		<div className="relative w-full max-w-md mx-2 md:mx-4">
@@ -31,7 +42,11 @@ const SearchBar = () => {
 				/>
 				<input
 					type="text"
-					placeholder="Search"
+					placeholder={props.placeholder}
+					autoComplete="off"
+					autoCorrect="off"
+					spellCheck="false"
+					aria-label={isHomeRoute ? "Search blocks" : "Search"}
 					value={query}
 					onChange={handleInputChange}
 					onFocus={() => setIsFocused(true)}
@@ -40,7 +55,7 @@ const SearchBar = () => {
 				/>
 			</div>
 
-			{/* Search Results Dropdown */}
+			{/* Search Results Dropdown (only shows on home route) */}
 			{showResults && (
 				<div className="absolute z-10 w-full mt-1 bg-[var(--background-primary)] rounded-lg shadow-lg max-h-80 overflow-y-auto custom-scroll">
 					{blocksToShow.length > 0 ? (
@@ -49,6 +64,7 @@ const SearchBar = () => {
 								<li
 									key={block.number}
 									className="px-4 py-2 hover:bg-[var(--background-secondary)] transition-colors rounded cursor-pointer"
+									onClick={() => navigate(`/meter/${block.meterId}/chart`)}
 								>
 									<div className="flex justify-between items-center">
 										<span className="font-medium">Block {block.number}</span>
