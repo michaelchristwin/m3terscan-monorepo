@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { useBlockStore } from "../state/blockStore";
+import { useBlockStore } from "../stores/blockStore";
 import { GoPulse } from "react-icons/go";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { BsClipboardCheck } from "react-icons/bs";
@@ -134,7 +134,7 @@ const DashboardLayout = () => {
 	return (
 		<div className="flex flex-col md:flex-row h-screen">
 			{/* Side Navigation - Desktop Only */}
-			<aside className="hidden md:flex md:w-52 lg:w-64 p-4 flex-shrink-0 h-screen sticky top-0 pr-1 flex-col">
+			<aside className="hidden lg:flex lg:w-56 p-4 flex-shrink-0 h-screen sticky top-0 pr-1 flex-col ">
 				<motion.div
 					initial={{ opacity: 0, y: -20 }}
 					animate={{ opacity: 1, y: 0 }}
@@ -170,23 +170,25 @@ const DashboardLayout = () => {
 			</main>
 
 			{/* Bottom Navigation - Mobile Only */}
-			<motion.nav
-				initial={{ y: 100 }}
-				animate={{ y: 0 }}
-				transition={{ type: "spring", stiffness: 300, damping: 30 }}
-				className="md:hidden fixed bottom-3.5 left-5 right-5 bg-[var(--background-primary)] rounded-3xl px-2 py-1 z-50"
-			>
-				<div className="flex items-center justify-around max-w-md mx-auto">
-					{navItems.map((item) => (
-						<BottomNavigationItem
-							key={item.path}
-							item={item}
-							index={0}
-							location={location}
-						/>
-					))}
-				</div>
-			</motion.nav>
+			<div className="w-full fixed bottom-3.5 grid place-items-center ">
+				<motion.nav
+					initial={{ y: 100 }}
+					animate={{ y: 0 }}
+					transition={{ type: "spring", stiffness: 300, damping: 30 }}
+					className="lg:hidden bg-[var(--background-primary)] rounded-3xl px-2 py-1 z-50 shadow-xl md:w-3/5 w-4/5 border-2 border-[var(--background-secondary)]"
+				>
+					<div className="flex items-center justify-around max-w-md mx-auto">
+						{navItems.map((item) => (
+							<BottomNavigationItem
+								key={item.path}
+								item={item}
+								index={0}
+								location={location}
+							/>
+						))}
+					</div>
+				</motion.nav>
+			</div>
 		</div>
 	);
 };

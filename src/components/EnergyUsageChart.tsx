@@ -186,7 +186,21 @@ const EnergyUsageChart = () => {
 	}, [usage, isLoading]);
 
 	if (isLoading) {
-		return <div className="p-4">Loading energy data...</div>;
+		return (
+			<motion.div
+				initial={{ opacity: 0, y: 40 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.5, ease: "easeOut" }}
+				className="p-4 bg-[var(--background-primary)] text-[var(--text-secondary)] rounded-lg"
+			>
+				<div className="flex justify-between items-center mb-6">
+					<div className="h-6 w-40 bg-[var(--background-secondary)] rounded animate-pulse"></div>
+				</div>
+				<div className="relative h-80">
+					<div className="h-full w-full bg-[var(--background-secondary)] rounded animate-pulse"></div>
+				</div>
+			</motion.div>
+		);
 	}
 
 	if (error) {
@@ -194,7 +208,21 @@ const EnergyUsageChart = () => {
 	}
 
 	if (!usage || usage.length === 0) {
-		return <div className="p-4">No energy usage data available</div>;
+		return (
+			<motion.div
+				initial={{ opacity: 0, y: 40 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.5, ease: "easeOut" }}
+				className="p-4 bg-[var(--background-primary)] text-[var(--text-secondary)] rounded-lg"
+			>
+				<div className="flex justify-between items-center mb-6">
+					<div className="h-6 w-40 bg-[var(--background-secondary)] rounded animate-pulse"></div>
+				</div>
+				<div className="relative h-80">
+					<div className="h-full w-full bg-[var(--background-secondary)] rounded animate-pulse"></div>
+				</div>
+			</motion.div>
+		);
 	}
 
 	return (
@@ -202,7 +230,7 @@ const EnergyUsageChart = () => {
 			initial={{ opacity: 0, y: 40 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.5, ease: "easeOut" }}
-			className="p-4 bg-[var(--background-primary)] text-[var(--text-secondary)] rounded-lg"
+			className="p-4 bg-[var(--background-primary)] text-[var(--text-secondary)] rounded-lg "
 		>
 			<div className="flex justify-between items-center mb-6">
 				<h3>Energy usage by hour</h3>

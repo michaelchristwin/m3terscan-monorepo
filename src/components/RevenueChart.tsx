@@ -57,7 +57,7 @@ const RevenueChart = () => {
 				borderWidth: 2,
 				borderRadius: 6,
 				fill: false,
-				tension: 0.4, // for line chart smoothness
+				tension: 0.35, // for line chart smoothness
 			},
 		],
 	};

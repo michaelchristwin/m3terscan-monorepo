@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useBlockStore } from "../state/blockStore";
+import { useBlockStore } from "../stores/blockStore";
 import { FaSlidersH } from "react-icons/fa";
 import FilterBlocks from "./FilterBlocks";
 import { motion, AnimatePresence } from "framer-motion";

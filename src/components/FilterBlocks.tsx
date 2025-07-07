@@ -31,7 +31,7 @@ export default function FilterBlocks({
 			exit={{ opacity: 0, y: -10 }}
 			transition={{ duration: 0.2 }}
 			ref={filterRef}
-			className="fixed sm:absolute inset-0 sm:inset-auto sm:right-0 sm:top-full mt-0 sm:mt-2 z-50 sm:z-10 w-full sm:w-64 bg-[var(--background-primary)] p-4 sm:p-4 rounded-none sm:rounded-lg shadow-lg border-0 sm:border border-[var(--background-secondary)]"
+			className="fixed sm:absolute inset-0 sm:inset-auto sm:right-0 sm:top-full mt-0 sm:mt-2 z-50 sm:z-10 w-full sm:w-64 bg-[var(--background-primary)] p-4 sm:p-4 rounded-none sm:rounded-lg shadow-lg border-1 sm:border border-[var(--background-secondary)]"
 		>
 			{/* Mobile header */}
 			<div className="sm:hidden flex justify-between items-center mb-4 pb-2 border-b border-[var(--background-secondary)]">

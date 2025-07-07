@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { FiSun, FiMoon, FiMonitor } from "react-icons/fi";
 import { CheckIcon } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const getSystemTheme = () =>
 	window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
@@ -53,59 +54,86 @@ const ThemeToggle = () => {
 	];
 
 	const currentIcon = {
-		light: <FiSun size={20} />,
-		dark: <FiMoon size={20} />,
+		light: (
+			<motion.div animate={{ rotate: 0 }}>
+				<FiSun size={20} />
+			</motion.div>
+		),
+		dark: (
+			<motion.div animate={{ rotate: 180 }}>
+				<FiMoon size={20} />
+			</motion.div>
+		),
 		system: <FiMonitor size={20} />,
 	}[theme];
 
 	return (
 		<div className="relative inline-block" ref={dropdownRef}>
-			<button
+			<motion.button
 				onClick={() => setOpen((prev) => !prev)}
 				className="p-2 rounded-full hover:text-[var(--icon-color)] cursor-pointer transition-colors"
 				aria-label="Toggle theme dropdown"
+				whileTap={{ scale: 0.9 }}
+				whileHover={{ scale: 1.1 }}
 			>
 				{currentIcon}
-			</button>
+			</motion.button>
 
-			{open && (
-				<div className="absolute right-0 mt-2 w-56 rounded-lg bg-[var(--background-primary)] shadow-xl z-50 overflow-hidden  animate-in fade-in zoom-in-95">
-					<ul className="py-1">
-						{options.map((opt) => (
-							<li
-								key={opt.value}
-								onClick={() => {
-									setTheme(opt.value);
-									setOpen(false);
-								}}
-								className={`
-							flex items-center px-4 py-2.5 text-sm cursor-pointer 
-							transition-colors duration-100 ease-out
-							hover:bg-[var(--background-secondary)]
-							${
-								theme === opt.value
-									? "text-[var(--icon-color)] "
-									: "text-[var(--text-secondary)]"
-							}
-							`}
-							>
-								<div className="mr-1 opacity-80">{opt.icon}</div>
-								<div className="flex-1">
-									<div>{opt.label}</div>
-									{opt.value === "system" && (
-										<span className="text-xs">Follows your OS preference</span>
+			<AnimatePresence>
+				{open && (
+					<motion.div
+						className="absolute right-0 mt-2 w-56 rounded-lg bg-[var(--background-primary)] shadow-xl z-50 overflow-hidden border-1 sm:border border-[var(--background-secondary)] "
+						initial={{ opacity: 0, y: -20, scale: 0.95 }}
+						animate={{ opacity: 1, y: 0, scale: 1 }}
+						exit={{ opacity: 0, y: -10, scale: 0.98 }}
+						transition={{ type: "spring", damping: 20, stiffness: 300 }}
+					>
+						<ul className="py-1">
+							{options.map((opt) => (
+								<motion.li
+									key={opt.value}
+									onClick={() => {
+										setTheme(opt.value);
+										setOpen(false);
+									}}
+									className={`
+                    flex items-center px-4 py-2.5 text-sm cursor-pointer 
+                    transition-colors duration-100 ease-out
+                    hover:bg-[var(--background-secondary)] rounded-lg
+                    ${
+											theme === opt.value
+												? "text-[var(--icon-color)]"
+												: "text-[var(--text-secondary)]"
+										}
+                  `}
+									whileHover={{ x: 1 }}
+									whileTap={{ scale: 0.98 }}
+								>
+									<div className="mr-1 opacity-80">{opt.icon}</div>
+									<div className="flex-1">
+										<div>{opt.label}</div>
+										{opt.value === "system" && (
+											<span className="text-xs">
+												Follows your OS preference
+											</span>
+										)}
+									</div>
+									{theme === opt.value && (
+										<motion.span
+											className="ml-4"
+											initial={{ scale: 0 }}
+											animate={{ scale: 1 }}
+											transition={{ type: "spring", stiffness: 500 }}
+										>
+											<CheckIcon className="h-4 w-4 text-[var(--icon-color)]" />
+										</motion.span>
 									)}
-								</div>
-								{theme === opt.value && (
-									<span className="ml-4">
-										<CheckIcon className="h-4 w-4 text-[var(--icon-color)]" />
-									</span>
-								)}
-							</li>
-						))}
-					</ul>
-				</div>
-			)}
+								</motion.li>
+							))}
+						</ul>
+					</motion.div>
+				)}
+			</AnimatePresence>
 		</div>
 	);
 };

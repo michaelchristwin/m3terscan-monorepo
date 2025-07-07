@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useBlockStore } from "../state/blockStore";
+import { useBlockStore } from "../stores/blockStore";
 
 export const useBlockData = () => {
 	const store = useBlockStore();
