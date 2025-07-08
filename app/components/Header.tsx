@@ -29,7 +29,7 @@ const Header = () => {
 
 	const shouldShowSearchBar = isAllowedBasePath && !hasForbiddenSubpath;
 
-	const isOverviewPage = location.pathname.includes("/overview");
+	const isOverviewPage = pathname.includes("/overview");
 
 	const searchPlaceHolder = isOverviewPage ? "Search Location" : "Search";
 

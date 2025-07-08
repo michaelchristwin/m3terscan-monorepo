@@ -1,5 +1,7 @@
-import { useActivityStore } from "../stores/activityStore";
-import { formatAddress } from "../utils/formatAddress";
+'use client'
+
+import { useActivityStore } from "../../../stores/activityStore";
+import { formatAddress } from "../../../utils/formatAddress";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaSliders } from "react-icons/fa6";
 
