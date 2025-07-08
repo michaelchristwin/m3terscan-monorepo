@@ -1,15 +1,16 @@
+import { useRouter } from "next/navigation";
 import { useBlockStore } from "../stores/blockStore";
-import { useNavigate } from "react-router";
+
 
 const Logo = () => {
 	const clearSelectedMeterId = useBlockStore(
 		(state) => state.clearSelectedMeterId
 	);
-	const navigate = useNavigate();
+	const navigate = useRouter();
 
 	const handleBack = () => {
 		clearSelectedMeterId();
-		navigate("/");
+		navigate.push("/");
 	};
 	return (
 		<small

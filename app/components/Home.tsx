@@ -1,8 +1,10 @@
+'use client';
+
 import { useEffect } from "react";
-import Card from "../components/Card";
+import Card from "./Card";
 import { useCardData } from "../hooks/useCardData";
-import RecentBlocks from "../components/RecentBlocks";
-import RevenueChart from "../components/RevenueChart";
+import RecentBlocks from "./RecentBlocks";
+import RevenueChart from "./RevenueChart";
 import { motion } from "framer-motion";
 import { formatCardValue } from "../utils/numberFormat";
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";

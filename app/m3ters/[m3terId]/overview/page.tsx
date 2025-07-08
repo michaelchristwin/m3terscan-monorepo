@@ -1,10 +1,12 @@
-import MapComponent from "../components/MapComponent";
+'use client'
+
+import MapComponent from "../../../components/MapComponent";
 import { FaMapMarkerAlt, FaBriefcase } from "react-icons/fa";
 import { FiClock } from "react-icons/fi";
 import { MdOutlineGpsFixed } from "react-icons/md";
 import { useState } from "react";
-import { formatDateTime } from "../utils/formatDateTime";
-import { useMapStore } from "../stores/mapStore";
+import { formatDateTime } from "../../../utils/formatDateTime";
+import { useMapStore } from "../../../stores/mapStore";
 import { motion } from "framer-motion";
 
 const Overview = () => {
@@ -92,3 +94,4 @@ const Overview = () => {
 };
 
 export default Overview;
+

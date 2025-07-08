@@ -1,7 +1,10 @@
+'use client'
+
 import { BiSearch } from "react-icons/bi";
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { useBlockStore } from "../stores/blockStore";
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 type SearchBarProps = {
 	placeholder: string;
@@ -9,9 +12,9 @@ type SearchBarProps = {
 };
 
 const SearchBar = ({ placeholder, onLocationSelect }: SearchBarProps) => {
-	const location = useLocation();
-	const isHomeRoute = location.pathname === "/";
-	const navigate = useNavigate();
+
+	const pathname = usePathname()
+	const isHomeRoute = pathname === "/";
 
 	const { searchBlocks, clearSearch, filteredData, blockData } =
 		useBlockStore();
@@ -64,6 +67,7 @@ const SearchBar = ({ placeholder, onLocationSelect }: SearchBarProps) => {
 					placeholder={placeholder}
 					autoComplete="off"
 					spellCheck="false"
+					aria-autocomplete="none"
 					value={query}
 					onChange={handleInputChange}
 					onKeyDown={handleKeyDown}
@@ -81,26 +85,26 @@ const SearchBar = ({ placeholder, onLocationSelect }: SearchBarProps) => {
 							<li
 								key={block.number}
 								className="px-4 py-2 hover:bg-[var(--background-secondary)] transition-colors rounded cursor-pointer"
-								onClick={() => navigate(`/meter/${block.meterId}/chart`)}
 							>
-								<div className="flex justify-between">
-									<span className="font-medium">Block {block.number}</span>
-									<span className="text-sm">{block.proposer}</span>
-								</div>
-								<div className="flex justify-between text-xs mt-1">
-									<span>
-										{block.date} {block.time}
-									</span>
-									<span
-										className={`px-2 py-0.5 rounded ${
-											block.status === "Successful"
-												? "text-[var(--color-success)]"
-												: "text-[var(--color-invalid)]"
-										}`}
-									>
-										{block.status}
-									</span>
-								</div>
+								<Link href={`/meter/${block.meterId}/chart`}>
+									<div className="flex justify-between">
+										<span className="font-medium">Block {block.number}</span>
+										<span className="text-sm">{block.proposer}</span>
+									</div>
+									<div className="flex justify-between text-xs mt-1">
+										<span>
+											{block.date} {block.time}
+										</span>
+										<span
+											className={`px-2 py-0.5 rounded ${block.status === "Successful"
+													? "text-[var(--color-success)]"
+													: "text-[var(--color-invalid)]"
+												}`}
+										>
+											{block.status}
+										</span>
+									</div>
+								</Link>
 							</li>
 						))}
 					</ul>

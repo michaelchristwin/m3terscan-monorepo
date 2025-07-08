@@ -3,7 +3,7 @@ import { useBlockStore } from "../stores/blockStore";
 import { FaSlidersH } from "react-icons/fa";
 import FilterBlocks from "./FilterBlocks";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router";
+import { useRouter } from "next/navigation";
 
 export default function RecentBlocks() {
 	const blockData = useBlockStore((state) => state.blockData);
@@ -13,7 +13,7 @@ export default function RecentBlocks() {
 		status: "",
 		proposer: "",
 	});
-	const navigate = useNavigate();
+	const navigate = useRouter();
 
 	// const handleRowClick =
 	// 	(proposer: string) => (e: React.MouseEvent<HTMLTableRowElement>) => {
@@ -139,7 +139,7 @@ export default function RecentBlocks() {
 												variants={rowVariants}
 												key={index}
 												onClick={() =>
-													navigate(`/meter/${block.meterId}/chart`)
+													navigate.push(`/meter/${block.meterId}/chart`)
 												}
 												className="text-sm hover:bg-[var(--background-secondary)] transition-colors"
 											>

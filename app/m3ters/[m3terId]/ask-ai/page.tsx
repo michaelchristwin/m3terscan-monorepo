@@ -1,3 +1,5 @@
+'use client'
+
 const AskAI = () => (
 	<div>
 		<h2>Ask Meter AI</h2>

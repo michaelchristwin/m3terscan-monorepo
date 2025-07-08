@@ -1,11 +1,14 @@
+'use client'
+
+import { usePathname } from "next/navigation";
 import Logo from "./Logo";
 import SearchBar from "./SearchBar";
 import ThemeToggle from "./ThemeToggle";
-import { useLocation } from "react-router";
 import { useMapStore } from "../stores/mapStore";
 
 const Header = () => {
-	const location = useLocation();
+
+	const pathname = usePathname()
 
 	// Show search bar only on these base paths
 	const showSearchBarPaths = ["/", "/meter"];
@@ -16,12 +19,12 @@ const Header = () => {
 	// Check if current path starts with allowed base path
 	const isAllowedBasePath = showSearchBarPaths.some(
 		(path) =>
-			location.pathname === path || location.pathname.startsWith(`${path}/`)
+			pathname === path || pathname.startsWith(`${path}/`)
 	);
 
 	// Check if current path contains any forbidden subpath
 	const hasForbiddenSubpath = hideSearchBarSubpaths.some((subpath) =>
-		location.pathname.includes(`/${subpath}`)
+		pathname.includes(`/${subpath}`)
 	);
 
 	const shouldShowSearchBar = isAllowedBasePath && !hasForbiddenSubpath;
