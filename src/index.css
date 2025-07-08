@@ -8,7 +8,7 @@
 		--scrollbar-thumb: var(--text-secondary);
 		--scrollbar-thumb-hover: var(--icon-color);
 		--scrollbar-width: 12px;
-		--scrollbar-border-radius: 6px;
+		--scrollbar-border-radius: 10px;
 		--scrollbar-border: 2px solid var(--background-secondary);
 	}
 
@@ -21,7 +21,7 @@
 	::-webkit-scrollbar {
 		width: var(--scrollbar-width);
 		height: var(--scrollbar-width);
-		border-radius: 5rem;
+		border-radius: 10rem;
 	}
 
 	::-webkit-scrollbar-track {
@@ -155,7 +155,7 @@ a:hover {
 }
 
 span {
-	font-size: x-small;
+	font-size: xx-small;
 }
 
 small {

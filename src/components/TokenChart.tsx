@@ -185,10 +185,6 @@ const TokenChart = () => {
 		return <div className="p-4 text-red-500">Error: {error}</div>;
 	}
 
-	if (!meterStablecoins || meterStablecoins.length === 0) {
-		return <div className="p-4">No Stablecoin data available</div>;
-	}
-
 	return (
 		<motion.div
 			initial={{ opacity: 0, y: 20 }}
