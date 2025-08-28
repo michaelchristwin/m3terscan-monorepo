@@ -63,3 +63,66 @@ const Header = () => {
 };
 
 export default Header;
+
+
+// 'use client'
+
+// import { usePathname } from "next/navigation";
+// import Logo from "./Logo";
+// import SearchBar from "./SearchBar";
+// import ThemeToggle from "./ThemeToggle";
+// import { useMapStore } from "../stores/mapStore";
+
+// const Header = () => {
+
+// 	const pathname = usePathname()
+
+// 	// Show search bar only on these base paths
+// 	const showSearchBarPaths = ["/", "/meter"];
+// 	// Hide search bar on these specific subpaths
+// 	const hideSearchBarSubpaths = ["chart", "trades", "activity", "ask-ai"];
+
+// 	// Check if current path starts with allowed base path
+// 	const isAllowedBasePath = showSearchBarPaths.some(
+// 		(path) =>
+// 			pathname === path || pathname.startsWith(`${path}/`)
+// 	);
+
+// 	// Check if current path contains any forbidden subpath
+// 	const hasForbiddenSubpath = hideSearchBarSubpaths.some((subpath) =>
+// 		pathname.includes(`/${subpath}`)
+// 	);
+
+// 	const shouldShowSearchBar = isAllowedBasePath && !hasForbiddenSubpath;
+// 	const isOverviewPage = pathname.includes("/overview");
+// 	const searchPlaceHolder = isOverviewPage ? "Search Location" : "Search";
+// 	const { setMapCenter } = useMapStore();
+
+// 	return (
+// 		<header className="bg-[var(--background)]  bg-opacity-90 border-b-2 border-b-[var(--background-secondary)]  mb-3">
+// 			<div className="lg:px-[15%] sm:px-[8%] px-[5%]">
+// 				<div className="flex items-center justify-between gap-2 py-2 md:py-3">
+// 					<div className="flex-shrink-0">
+// 						<Logo />
+// 					</div>
+
+// 					{shouldShowSearchBar && (
+// 						<div className="flex-1 flex justify-center">
+// 							<SearchBar
+// 								placeholder={searchPlaceHolder}
+// 								onLocationSelect={setMapCenter}
+// 							/>
+// 						</div>
+// 					)}
+
+// 					<div className="flex-shrink-0 ml-auto md:ml-4">
+// 						<ThemeToggle />
+// 					</div>
+// 				</div>
+// 			</div>
+// 		</header>
+// 	);
+// };
+
+// export default Header;
+

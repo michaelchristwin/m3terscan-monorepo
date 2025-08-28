@@ -3,11 +3,7 @@ import { useBlockStore } from "../stores/blockStore";
 
 export const useBlockData = () => {
 	const store = useBlockStore();
-	const { fetchBlockData, fetchEnergyUsageData, fetchStablecoinData } = store;
-
-	const refreshBlocks = useCallback(() => {
-		fetchBlockData();
-	}, [fetchBlockData]);
+	const { fetchEnergyUsageData, fetchStablecoinData } = store;
 
 	const refreshEnergyData = useCallback(() => {
 		fetchEnergyUsageData();
@@ -19,7 +15,6 @@ export const useBlockData = () => {
 
 	return {
 		...store,
-		refreshBlocks,
 		refreshEnergyData,
 		refreshStablecoinData,
 	};

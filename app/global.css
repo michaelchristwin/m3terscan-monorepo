@@ -186,7 +186,6 @@ input {
 	color: var(--text-secondary);
 	outline: none;
 	border: none;
-	border-radius: 10.2px;
 }
 
 button {

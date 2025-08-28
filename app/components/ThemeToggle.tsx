@@ -9,7 +9,7 @@ const getSystemTheme = () =>
 const ThemeToggle = () => {
 	const [theme, setTheme] = useState(() => {
 		if (typeof window !== "undefined") {
-			return localStorage.getItem("theme") || "light";
+			return localStorage.getItem("theme") || "dark";
 		}
 		return "system";
 	});
@@ -60,7 +60,7 @@ const ThemeToggle = () => {
 			</motion.div>
 		),
 		dark: (
-			<motion.div animate={{ rotate: 180 }}>
+			<motion.div animate={{ rotate: 0 }}>
 				<FiMoon size={20} />
 			</motion.div>
 		),

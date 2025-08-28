@@ -55,7 +55,7 @@ const SearchBar = ({ placeholder, onLocationSelect }: SearchBarProps) => {
 	const showResults = isHomeRoute && isFocused && blocksToShow.length > 0;
 
 	return (
-		<div className="relative w-full max-w-md mx-2 md:mx-4">
+		<div className="relative w-full max-w-md">
 			{/* Input */}
 			<div className="relative flex items-center">
 				<BiSearch
@@ -64,6 +64,7 @@ const SearchBar = ({ placeholder, onLocationSelect }: SearchBarProps) => {
 				/>
 				<input
 					type="text"
+					name="search"
 					placeholder={placeholder}
 					autoComplete="off"
 					spellCheck="false"
@@ -73,7 +74,7 @@ const SearchBar = ({ placeholder, onLocationSelect }: SearchBarProps) => {
 					onKeyDown={handleKeyDown}
 					onFocus={() => setIsFocused(true)}
 					onBlur={() => setTimeout(() => setIsFocused(false), 200)}
-					className="w-full pl-10 pr-4 py-2 rounded-lg bg-[var(--background-secondary)]"
+					className="w-full pl-10 pr-4 py-2 rounded-md bg-[var(--background-secondary)]"
 				/>
 			</div>
 

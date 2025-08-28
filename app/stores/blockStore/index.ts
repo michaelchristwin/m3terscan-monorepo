@@ -2,7 +2,6 @@ import { create } from "zustand";
 import type { BlockStore, BlockData } from "./types";
 import { staticBlockData, globalStablecoinData } from "./constants";
 import {
-	fetchBlockDataFromApi,
 	fetchEnergyUsageFromApi,
 	fetchStablecoinDataFromApi,
 	fetchHeatmapDataFromApi,
@@ -13,6 +12,8 @@ import {
 	generateMockHeatmapData,
 	generateMockHeatmapDataByYear,
 } from "./utils/mockGenerators";
+import { getChainLength } from "../../lib/service";
+// import { TransactionResponse } from "ethers";
 
 export const useBlockStore = create<BlockStore>((set, get) => {
 	// Initialize with mock data
@@ -25,6 +26,8 @@ export const useBlockStore = create<BlockStore>((set, get) => {
 
 	return {
 		// Initial state
+		chainLength: 0n,
+		transactions: undefined,
 		blockData: staticBlockData,
 		filteredData: [],
 		hourlyEnergyUsage: [],
@@ -177,21 +180,16 @@ export const useBlockStore = create<BlockStore>((set, get) => {
 			});
 		},
 
-		fetchBlockData: async () => {
-			const { useMockData } = get();
-			if (useMockData) {
-				set({ blockData: staticBlockData, error: null });
-				return;
-			}
-
+		getChainLength: async (): Promise<void> => {
 			set({ isLoading: true, error: null });
 			try {
-				const apiBlockData = await fetchBlockDataFromApi();
+				const chainLength = await getChainLength()
 				set({
-					blockData: apiBlockData,
+					chainLength,
 					isLoading: false,
 					error: null,
 				});
+				return chainLength
 			} catch (error) {
 				set({
 					isLoading: false,
@@ -352,13 +350,11 @@ export const useBlockStore = create<BlockStore>((set, get) => {
 			const { selectedMeterId } = get();
 			const meterIdParam = selectedMeterId || undefined;
 			if (useMock) {
-				get().fetchBlockData();
 				get().fetchEnergyUsageData(meterIdParam);
 				get().fetchStablecoinData(meterIdParam);
 				get().fetchHeatmapData(meterIdParam);
 			} else {
 				Promise.all([
-					get().fetchBlockData(),
 					get().fetchEnergyUsageData(meterIdParam),
 					get().fetchStablecoinData(meterIdParam),
 					get().fetchHeatmapData(meterIdParam),

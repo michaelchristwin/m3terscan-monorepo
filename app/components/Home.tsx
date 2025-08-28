@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Card from "./Card";
 import { useCardData } from "../hooks/useCardData";
 import RecentBlocks from "./RecentBlocks";
+// import SearchBar from "./SearchBar";
 import RevenueChart from "./RevenueChart";
 import { motion } from "framer-motion";
 import { formatCardValue } from "../utils/numberFormat";
@@ -29,7 +30,27 @@ const Home = () => {
 	}, [refreshData]);
 
 	return (
-		<main className=" pb-4 px-4 md:px-14 lg:px-20">
+		<div className="">
+			{/* <div className="mb-15">
+				<SearchBar
+					placeholder={"Search "}
+				/>
+			</div> */}
+
+			{/* <div className="grid grid-cols-3 rounded-md py-3 mb-3 border-2 border-[var(--background-secondary)]">
+				<p className="px-5 py-2 border-inherit border-r">
+					Transactions <br />
+					100
+				</p>
+				<p className="px-5 py-2 border-inherit border-r">
+					Base Tariff <br />
+					$0.2
+				</p>
+				<p className="px-5 py-2 border-inherit border-r">
+					Latest Block <br />
+					2
+				</p>
+			</div> */}
 			<motion.div
 				className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-y-0 gap-x-10 "
 				variants={container}
@@ -67,9 +88,8 @@ const Home = () => {
 			</div>
 			<RevenueChart />
 
-			<h3>Recent Blocks</h3>
 			<RecentBlocks />
-		</main>
+		</div>
 	);
 };
 

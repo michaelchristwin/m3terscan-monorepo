@@ -66,6 +66,8 @@ export interface ApiHeatmapData {
 
 // Store Type
 export interface BlockStore {
+	chainLength: bigint;
+	transactions: Array<any> | undefined;
 	blockData: BlockData[];
 	filteredData: BlockData[];
 	hourlyEnergyUsage: HourlyEnergyUsage[];
@@ -105,7 +107,7 @@ export interface BlockStore {
 	selectMeterId: (meterId: string) => void;
 	clearSelectedMeterId: () => void;
 
-	fetchBlockData: () => Promise<void>;
+	getChainLength: () => Promise<void>;
 	fetchEnergyUsageData: (meterId?: string) => Promise<void>;
 	fetchStablecoinData: (meterId?: string) => Promise<void>;
 	fetchHeatmapData: (meterId?: string) => Promise<void>;

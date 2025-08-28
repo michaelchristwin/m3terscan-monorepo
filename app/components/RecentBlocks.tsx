@@ -1,46 +1,29 @@
-import { useState } from "react";
+// import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useBlockStore } from "../stores/blockStore";
-import { FaSlidersH } from "react-icons/fa";
-import FilterBlocks from "./FilterBlocks";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
 
 export default function RecentBlocks() {
-	const blockData = useBlockStore((state) => state.blockData);
-	const [showAll, setShowAll] = useState(false);
-	const [showFilters, setShowFilters] = useState(false);
-	const [filters, setFilters] = useState({
-		status: "",
-		proposer: "",
-	});
-	const navigate = useRouter();
+	const { isLoading, chainLength, getChainLength } = useBlockStore();
 
-	// const handleRowClick =
-	// 	(proposer: string) => (e: React.MouseEvent<HTMLTableRowElement>) => {
-	// 		e.preventDefault();
-	// 		selectMeterId(proposer);
-	// 	};
+	const [transactions, setTransactions] = useState<any[] | undefined>(undefined)
+	const [loadingTx, setLoadingTx] = useState(false)
 
-	// Apply filters to block data
-	const filteredBlocks = blockData.filter((block) => {
-		const statusMatch = !filters.status || block.status === filters.status;
-		const proposerMatch =
-			!filters.proposer ||
-			block.proposer.toLowerCase().includes(filters.proposer.toLowerCase());
-		return statusMatch && proposerMatch;
-	});
+	useEffect(() => {
+		if (!chainLength && !transactions) (async () => {
+			await Promise.all([getChainLength(), loadTransactions()]);
+		})()
+	}, [getChainLength, chainLength, transactions])
 
-	const visibleBlocks = showAll ? filteredBlocks : filteredBlocks.slice(0, 5);
-
-	const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const { name, value } = e.target;
-		setFilters((prev) => ({ ...prev, [name]: value }));
-	};
-
-	const handleClearFilters = () => {
-		setFilters({ status: "", proposer: "" });
-		setShowFilters(false);
-	};
+	const loadTransactions = () => {
+		setLoadingTx(true)
+		fetch("/api/transactions")
+			.then(async res => {
+				const value: Array<any> = (await res.json()).result?.rows
+				setTransactions(value.sort((a, b) => new Date(b.block_time).getTime() - new Date(a.block_time).getTime()))
+				setLoadingTx(false)
+			})
+	}
 
 	const rowVariants = {
 		hidden: { opacity: 0, y: 10 },
@@ -58,133 +41,83 @@ export default function RecentBlocks() {
 			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.5, ease: "easeOut" }}
-			className="bg-[var(--background-primary)] text-[var(--text-secondary)] rounded-xl p-4 relative"
+			className="border-2 border-[var(--background-primary)] text-[var(--text-secondary)] rounded-md relative mb-20"
 		>
-			<motion.div className="flex justify-between items-center mb-4">
-				<h3 className="text-sm font-medium">
-					{showAll ? `All Blocks (${blockData.length})` : `Last 5 blocks `}
-				</h3>
-				<div className="flex items-center gap-5">
-					{showAll && (
-						<motion.div className="relative" layout>
-							<motion.button
-								whileHover={{ scale: 1.05 }}
-								whileTap={{ scale: 0.95 }}
-								transition={{ type: "spring", stiffness: 300 }}
-								onClick={() => setShowFilters(!showFilters)}
-								className="p-1 hover:text-[var(--icon-color)] transition-colors cursor-pointer"
-							>
-								<FaSlidersH />
-							</motion.button>
-
-							{/* Filter Dropdown */}
-							<AnimatePresence>
-								{showFilters && (
-									<FilterBlocks
-										filters={filters}
-										onFilterChange={handleFilterChange}
-										onClearFilters={handleClearFilters}
-										onClose={() => setShowFilters(false)}
-									/>
-								)}
-							</AnimatePresence>
-						</motion.div>
-					)}
-
-					{blockData.length > 5 && (
-						<a
-							onClick={() => setShowAll(!showAll)}
-							className="text-sm cursor-pointer"
-						>
-							{showAll ? "See less" : "See more"}
-						</a>
-					)}
-				</div>
-			</motion.div>
-
 			<div className="relative">
-				<div className="overflow-x-auto pb-2 -mx-4 px-4">
+				<div className="overflow-x-auto">
+					<p className="px-3 py-2">Latest Blocks</p>
 					<div className="min-w-[600px]">
-						<table className="w-full">
+						<table className="w-full border-[var(--background-secondary)]">
 							{/* Table Head */}
 							<thead>
-								<tr className="text-left border-b border-[var(--background-secondary)]">
-									<th className="pb-2 pr-4 font-normal whitespace-nowrap">
+								<tr className="text-left p-3 border-b border-[var(--background-secondary)]">
+									<th className="py-3 px-4 font-normal whitespace-nowrap">
 										<small>Block number</small>
 									</th>
-									<th className="pb-2 pr-4 font-normal whitespace-nowrap">
-										<small>State Address</small>
+									<th className="py-3 px-4 font-normal whitespace-nowrap">
+										<small>Block Transaction</small>
 									</th>
-									<th className="pb-2 pr-4 font-normal whitespace-nowrap">
+									<th className="py-3 px-4 font-normal whitespace-nowrap">
 										<small>Status</small>
 									</th>
-									<th className="pb-2 pr-4 font-normal whitespace-nowrap">
+									<th className="py-3 px-4 font-normal whitespace-nowrap">
 										<small>Date/Time</small>
 									</th>
-									<th className="pb-2 font-normal whitespace-nowrap">
+									<th className="py-3 px-4 font-normal whitespace-nowrap">
 										<small>Proposal</small>
 									</th>
 								</tr>
 							</thead>
-
-							{/* Table Body */}
-							<tbody className="divide-y divide-[var(--background-secondary)]">
-								<AnimatePresence>
-									{visibleBlocks.length > 0 ? (
-										visibleBlocks.map((block, index) => (
-											<motion.tr
-												custom={index}
-												initial="hidden"
-												animate="visible"
-												variants={rowVariants}
-												key={index}
-												onClick={() =>
-													navigate.push(`/meter/${block.meterId}/chart`)
-												}
-												className="text-sm hover:bg-[var(--background-secondary)] transition-colors"
-											>
-												<td className="py-3 pr-4 font-medium whitespace-nowrap">
-													Block {block.number}
-												</td>
-												<td className="py-3 pr-4 truncate max-w-[120px]">
-													<span>{block.address}</span>
-												</td>
-												<td
-													className={`py-3 pr-4 font-medium whitespace-nowrap ${
-														block.status === "Successful"
-															? "text-[var(--color-success)]"
-															: "text-[var(--color-invalid)]"
-													}`}
-												>
-													{block.status}
-												</td>
-												<td className="py-3 pr-4 whitespace-nowrap">
-													<span>{block.date}</span>
-													<span className="text-xs font-extralight ml-1">
-														{block.time}
-													</span>
-												</td>
-												<td className="py-3 whitespace-nowrap text-xs">
-													{block.proposer}
-												</td>
-											</motion.tr>
-										))
-									) : (
-										<motion.tr
-											initial={{ opacity: 0 }}
-											animate={{ opacity: 1 }}
-											transition={{ duration: 0.3 }}
-										>
-											<td
-												colSpan={5}
-												className="py-4 text-center text-sm text-[var(--text-secondary)]"
-											>
-												No blocks match your filters
-											</td>
-										</motion.tr>
-									)}
-								</AnimatePresence>
-							</tbody>
+							{
+								isLoading || loadingTx ? <p>Loading...</p>
+									: (
+										<tbody className="divide-y divide-[var(--background-secondary)]">
+											<AnimatePresence>
+												{transactions && transactions.length > 0 ? (
+													transactions.map((tx, index) => (
+														<motion.tr
+															custom={index}
+															initial="hidden"
+															animate="visible"
+															variants={rowVariants}
+															key={index}
+															className="text-sm hover:bg-[var(--background-secondary)] transition-colors"
+														>
+															<td className="py-3 px-4 font-medium whitespace-nowrap">
+																Block { chainLength - BigInt(index) }
+															</td>
+															<td className="py-3 px-4 truncate max-w-[120px]">
+																<a className=" text-blue-400" target="_blank" href={`https://sepolia.etherscan.io/tx/${tx.hash}`}>{ tx.hash }</a>
+															</td>
+															<td className="py-3 text-[var(--color-success)] px-4 font-medium whitespace-nowrap">
+																Successful
+															</td>
+															<td className="py-3 pr-4 whitespace-nowrap">
+																<span>{ tx.block_time }</span>
+															</td>
+															<td className="py-3 px-4 font-medium whitespace-nowrap">
+																{ tx.from }
+															</td>
+														</motion.tr>
+													))
+												) : (
+													<motion.tr
+														initial={{ opacity: 0 }}
+														animate={{ opacity: 1 }}
+														transition={{ duration: 0.3 }}
+													>
+														<td
+															colSpan={5}
+															className="py-4 text-center text-sm text-[var(--text-secondary)]"
+														>
+															No blocks match your filters
+														</td>
+													</motion.tr>
+												)}
+											</AnimatePresence>
+										</tbody>
+									)
+							}
 						</table>
 					</div>
 				</div>
