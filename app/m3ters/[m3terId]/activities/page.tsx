@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+//import { useEffect } from "react";
 import { useActivityStore } from "../../../stores/activityStore";
 import { formatAddress } from "../../../utils/formatAddress";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaSliders } from "react-icons/fa6";
-import { m3terClient } from "../../../utils/client";
+//import { m3terClient } from "../../../utils/client";
 
 const Activity = () => {
   const activities = useActivityStore((state) => state.activities);
@@ -13,14 +13,14 @@ const Activity = () => {
   if (activities.length === 0) {
     return <p className="text-center py-4">No recent activity.</p>;
   }
-  useEffect(() => {
-    (async () => {
-      const dp = await m3terClient.v2.dataPoints.getMeterDataPoints({
-        meterNumber: 0,
-      });
-      console.log(dp.map((d) => d.node?.timestamp));
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     const dp = await m3terClient.v2.dataPoints.getMeterDataPoints({
+  //       meterNumber: 0,
+  //     });
+  //     console.log(dp.map((d) => d.node?.timestamp));
+  //   })();
+  // }, []);
 
   return (
     <motion.div
