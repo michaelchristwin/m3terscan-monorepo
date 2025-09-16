@@ -1,23 +1,21 @@
 "use client";
 
 import { Suspense, use } from "react";
-import { useActivityStore } from "../../../stores/activityStore";
+import { useParams } from "next/navigation";
 import { formatAddress } from "../../../utils/formatAddress";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaSliders } from "react-icons/fa6";
 import { m3terClient } from "../../../utils/client";
 import { MeterDataPointEdgeV2 } from "m3ter-graphql-client";
-import { timeAgo } from "../../../utils/timeAgo";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
+dayjs.extend(relativeTime);
 const Activity = () => {
-  const activities = useActivityStore((state) => state.activities);
-
-  if (activities.length === 0) {
-    return <p className="text-center py-4">No recent activity.</p>;
-  }
+  const params = useParams<{ m3terId: string }>();
 
   const dp = m3terClient.v2.dataPoints.getMeterDataPoints({
-    meterNumber: 0,
+    meterNumber: Number(params.m3terId),
   });
 
   return (
@@ -71,6 +69,7 @@ const Activities = ({
   dataPromise: Promise<MeterDataPointEdgeV2[]>;
 }) => {
   const data = use(dataPromise);
+
   return (
     <>
       {data.map((item, index) => (
@@ -83,10 +82,12 @@ const Activities = ({
           className="even:bg-[var(--background-primary)]"
         >
           <td className="py-4 px-4">
-            <span>{timeAgo(Number(item.node?.timestamp))}</span>
+            <span>
+              {dayjs(dayjs(item.node?.timestamp).toISOString()).fromNow()}
+            </span>
           </td>
           <td className="py-4 px-4">
-            <span>{item.node?.payload?.energy}</span>
+            <span>{item.node?.payload?.energy?.toFixed(2)} kWh</span>
           </td>
           <td className="p-4">
             <span className="block md:hidden">
@@ -97,7 +98,10 @@ const Activities = ({
             </span>
           </td>
           <td className="py-4 px-4">
-            <span>{(item.node?.payload?.energy as number) * 0.6}</span>
+            <span>
+              {Number((item.node?.payload?.energy as number) * 0.6).toFixed(2)}{" "}
+              USD
+            </span>
           </td>
           <td className={`py-4 px-4 font-medium text-[var(--color-success)]`}>
             <span>Valid</span>
