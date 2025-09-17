@@ -69,7 +69,7 @@ const Activities = ({
   dataPromise: Promise<MeterDataPointEdgeV2[]>;
 }) => {
   const data = use(dataPromise);
-
+  console.log(data);
   return (
     <>
       {data.map((item, index) => (
